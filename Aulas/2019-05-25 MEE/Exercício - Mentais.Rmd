@@ -1,0 +1,64 @@
+---
+title: "Untitled"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+  ##Exercício 3
+
+Criando o banco de dados
+```{r}
+dados.mentais <- read.csv2("C:/Users/logonlb/Desktop/MEE/Dados/dados.mentais.csv")
+```
+
+Carregando pacote
+```{r}
+library(lavaan)
+```
+
+Identificação do modelo
+q = 15
+p = 6
+p(p+1)/2 = 6*7/2 = 21
+Identificável
+
+
+Especificação do modelo
+```{r}
+modelo3 <- 'verb =~ x1 + x2 + x3
+mat =~ y1 + y2 + y3
+verb ~~ mat'
+```
+
+Estimação do modelo
+```{r}
+modfit3 <- sem(modelo3, data= dados.mentais, std.lv = TRUE)
+summary(modfit3)
+```
+
+Com o modelo padronizado, é mostrada a correlação ao invés da variância.
+```{r}
+standardizedSolution(modfit3, type='std.all')
+```
+
+Alternativa: Análise fatorial confirmatória.
+
+##Exercício 5 - Verificação da qualidade do ajuste do modelo
+
+```{r}
+summary(modfit3, fit.measures = TRUE)
+```
+
+Qui-quadrado = 
+CFI = 1; Se maior que 0,8, então ok.
+TLI = 1,032; ajuste perfeito (maior que 0,8).
+RMSEA = 0; necessário abaixo de 0,05.
+SRMR = 0.068; necessário abaixo de 0,05; não tão bom.
+
+```{r}
+summary(modfit3, modindices = TRUE)
+```
+

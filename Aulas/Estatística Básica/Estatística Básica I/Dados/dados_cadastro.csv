@@ -1,0 +1,37 @@
+Id;Turma;Sexo;Estado Civil;Grau de Instrucao;N de Filhos;Salario;Idade;Regiao de Procedencia;Altura;Peso;Fuma;Tolerancia;Exercicio
+1;A;F;solteiro;ensino fundamental;;4;26;interior;1,6;60,5;N;P;0
+2;A;F;casado;ensino fundamental;1;4,56;32;capital;1,69;55;N;M;0
+3;A;M;casado;ensino fundamental;2;5,25;34;capital;1,85;72,8;N;P;5
+4;A;M;solteiro;ensino médio;;5,73;29;outra;1,85;80,9;N;P;5
+5;A;F;solteiro;ensino fundamental;;6,26;27;outra;1,56;49;N;M;2
+6;A;M;casado;ensino fundamental;0;6,66;28;interior;1,72;73;N;M;2
+7;A;F;solteiro;ensino fundamental;;6,86;33;interior;1,64;58;N;P;3
+8;A;M;solteiro;ensino fundamental;;7,39;31;capital;1,66;55;S;I;2
+9;A;F;casado;ensino médio;1;7,59;34;capital;1,45;44;N;M;3
+10;A;F;solteiro;ensino médio;;7,44;25;outra;1,57;49;N;P;2
+11;A;F;casado;ensino médio;2;8,12;33;interior;1,73;73;S;I;2
+12;A;M;solteiro;ensino fundamental;;8,46;27;capital;1,68;52,5;N;P;10
+13;A;M;solteiro;ensino médio;;8,74;30;outra;1,8;70;N;P;6
+14;A;M;casado;ensino fundamental;3;8,95;29;outra;1,73;68;S;I;5
+15;A;F;casado;ensino médio;0;9,13;30;interior;1,55;54,5;N;M;4
+16;A;F;solteiro;ensino médio;;9,35;30;outra;1,57;49;N;M;0
+17;A;M;casado;ensino médio;1;9,77;31;capital;1,7;58;N;P;3
+18;A;M;casado;ensino fundamental;2;9,8;31;outra;1,73;87;N;M;3
+19;B;F;solteiro;superior;;10,53;25;interior;1,76;75;S;I;1
+20;B;M;solteiro;ensino médio;;10,76;32;interior;1,71;73;N;P;4
+21;B;F;casado;ensino médio;1;11,06;30;outra;1,63;55;N;P;2
+22;B;M;solteiro;ensino médio;;11,59;31;capital;1,67;58;N;P;4
+23;B;F;solteiro;ensino fundamental;;12;35;outra;1,5;45;S;I;8
+24;B;F;casado;superior;0;12,79;26;outra;1,65;57;N;M;10
+25;B;F;casado;ensino médio;2;13,23;32;interior;1,68;57;N;M;8
+26;B;F;casado;ensino médio;2;13,6;35;outra;1,6;50;N;P;2
+27;B;M;solteiro;ensino fundamental;;13,85;34;outra;1,72;70;N;I;0
+28;B;M;casado;ensino médio;0;14,69;29;interior;1,8;72;N;P;0
+29;B;M;casado;ensino médio;5;14,71;27;interior;1,68;66;S;I;1
+30;B;M;casado;ensino médio;2;15,99;30;capital;1,9;80;S;I;2
+31;B;M;solteiro;superior;;16,22;31;outra;1,82;76;N;M;0
+32;B;F;casado;ensino médio;1;16,61;33;interior;1,64;58;S;I;4
+33;B;M;casado;superior;3;17,26;28;capital;1,78;82;N;M;10
+34;B;F;solteiro;superior;;18,75;33;capital;1,6;50;N;M;15
+35;B;F;casado;ensino médio;2;19,4;32;capital;1,67;55;N;I;2
+36;B;M;casado;superior;3;23,3;28;interior;1,74;70;S;I;6

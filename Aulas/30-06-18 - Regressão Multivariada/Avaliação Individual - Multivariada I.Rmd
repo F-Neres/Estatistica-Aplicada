@@ -1,0 +1,246 @@
+---
+title: "Avaliação Individual - Multivariada I"
+author: "Felipe Neres Silva Bezerra"
+date: "30 de junho de 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+    Antes de começar a avaliação, perceba que ela está dividida em dois tópicos principais: "Modelagem e Diagnóstico" e "Interpretação de Modelos".
+    Para a parte de "Modelagem e Diagnóstico", ela é divida em 5 tópicos (numeradas de 1 a 5), sendo que existem perguntas para serem respondidas nos tópicos: 2 (A e B), 3 (A e B), 4 e 5. Existe uma linha de comando em R que deve ser alterada no tópico 4 (substituir ---).
+    Para a parte de "Interpretação de Modelos", existem questões nos tópicos 6 a 10, e uma linha de comando a ser alterada (substituir ---) no tópico 10.
+    Cada tópico vale 1 ponto.
+    Não se esqueça de colocar o seu nome no cabeçalho desse arquivo. Esse arquivo pode ser enviado ao meu [email](jvmelis@gmail.com) até 18/08/2018.
+    Boa Prova!
+
+
+# Modelagem e Diangóstico
+## 1. Leitura dos dados e construção do modelo 
+
+Para esse exercício utilizaremos os dados de `Prestige`, presente no pacote `car`
+
+```{r}
+if(!require(car)){install.packages("car")}
+data("Prestige")
+summary(Prestige)
+Prestige<-na.omit(Prestige)
+```
+`education`: Quantidade média de anos estudantes (1971).
+
+`income`: Ganho salarial médio, em dólares (1971).
+
+`women`: Porcentagem de mulheres na profissão.
+
+`prestige`: Escore de prestígio, segundo [Pineo-Porter](https://en.wikipedia.org/wiki/Occupational_prestige) para ocupações, a partir de inventários realizados na década de 1960.
+
+`census`: Código de ocupação segundo o censo canadense.
+
+`type`: Tipo de ocupação. Um fator com níveis: `bc`, *Blue Collar*; `prof`, *Professional*, *Managerial*, e *Technical*; `wc`, *White Collar*
+
+
+Construindo o modelo geral (`mod_geral`), com todas as variáveis para explicar o prestígio social das pessoas:
+```{r}
+mod_geral <- lm(prestige~., Prestige)
+summary(mod_geral)
+```
+
+## 2. Análise gráfica do modelo
+
+```{r}
+par(mfrow=c(2,2))
+plot(mod_geral)
+```
+
+### A. Questão: 
+Quais são os pressupostos que devemos analisar nesses gráficos? Existe algum que parece estar sendo violado? Explique.
+
+**R:**
+*Residual vs Fitted e Scale-Location: observando se a disposição das observações quando confrontados os resíduos (ou os resíduos padronizados) contra os valores previstos para a variável resposta, certos padrões podem indicar não-linearidade ou heterocedasticidade dos resíduos Embora no gráfico RESIDUALS VS FITTED a disposição das observações demonstre um padrão de concentração nas extremidades horizontais, indicando que a variância não se mantem constante ao longo do regressão, este padrão não aparece no gráfico SCALE-LOCATION*
+*Normal Q-Q: o formato retilíneo formado pelos resíduos padronizados em comparação com os quantis de uma distribuição normal teórica servem para avaliar a normalidade da distribuição dos resíduos. E é o que se observa nesta regressão.*
+*Residual vs Leverage: busca-se identificar observações que constituam em outliers e possual alto grau de alavancagem; observações assim têm o potencial desproporcional de influenciar os resultados das observações. As observações destacadas 'medical.technicians', 'general.managers' e 'service.station.attendant' podem estar impactando os coeficiente da regressão além do comum.*
+
+### B. Questão:
+
+**R:** *A violação do pressuposto de normalidade dos resíduos pode acarretar em vieses ou não-significância nos resultados que não podem ser distinguidos dos resultados verdadeiros.*
+
+## 3. Correlação de variáveis
+Visualização da correlação entre variáveis:
+
+```{r}
+fcor<-function(x,y){
+  par(usr=c(0,1,0,1))
+  txt<- as.character(round(cor(x,y),2))
+  text(0.5, 0.5, txt, cex=1.5)
+}
+
+flines <-function(x,y){
+        points(x,y)
+        abline(lm(y~x), col="red")
+}
+
+pairs(Prestige, 
+      lower.panel= flines, 
+      upper.panel = fcor)
+```
+
+Analise VIF:
+
+```{r}
+vif(mod_geral)
+```
+
+### A. Questão: 
+De que maneira variáveis correlacionadas podem afetar a interpretação da equação da regressão? Explique.
+
+**R:** *Variáveis que explicam o modelo, quando altamente correlacionadas, ferem o pressuposto de independência, sendo que uma das variáveis apenas seria necessária para explicar a variável resposta. Em adição, não haverá valores distintos de uma variável explicativa para um mesmo valor de outra se elas estiverem relacionadas entre si.*
+
+### B. Questão: 
+Qual a diferença entre variáveis independentes interativas com variáveis independentes correlacionadas? Explique.
+
+**R:** *Quando o impacto de uma variável independente sobre o modelo sofre o efeito da interação com outra variável independente, ou seja, quando a interação entre duas ou mais variáveis independentes explica grande parte do modelo, diz-se que são variáveis independentes interativas. Enquanto que variáveis independentes correlacionadas indicam que elas podem não ser de fato independentes e que a variação dos valores das variáveis entre as observações apresentará alguma tendência não aleatória.*
+
+
+## 4. Mudança do modelo com análises VIF e gráfica
+
+Escolha, a partir dos exames prévios anteriores, algumas variáveis independentes para propor um novo modelo. Substitua o `---` pelo nome das variáveis (`education`, `income`, `women`, `census` e/ou `type`), separadas por `+`:
+
+```{r}
+mod_novo <- lm(prestige ~ 
+                 income + women,  # Substitua --- pelo nome das variáveis que julga importante 
+               Prestige)
+summary(mod_novo)
+```
+Verificação grafica do novo modelo (`mod_novo`):
+
+```{r}
+par(mfrow=c(2,2))
+plot(mod_novo)
+```
+Correlação das variáveis independentes:
+
+```{r}
+vif(mod_novo)
+```
+### Questão:
+O novo modelo parece adequado? Explique.
+
+**R**: *Seguindo com a análise gráfica dos resíduos, os pressupostos de heterocedasticidade e normalidade parecem se cumprir no novo modelo. Dois outliers vistos no modelo anterior ('medical.technicians' e 'service.station.attendant') não são mais encontrados, entretanto, outras duas observações aparecem como novos outliers ('ministers' e 'physicians'). Segundo os valores de VIF das variáveis escolhidas, o pressuposto que demanda ausência de multicolinearidade também é atendido. Todavia, segundo o gráfico de resíduos contra predições da variável resposta, os resíduos não obedecem ao pressuposto de linearidade. Sendo assim, o modelo não parece adequado.*
+
+## 5. ANOVA dos modelos
+Compare os modelos antigo (`mod_geral`) e novo (`mod_novo`) usando `anova`:
+
+```{r}
+anova(mod_novo, mod_geral)
+```
+### Questão:
+Qual dos dois modelos você julga mais adequado? Explique.
+
+**R**: *A inclusão das únicas variáveis independentes que apresentaram valores de VIF razoavelmente baixos e que não apresentam tanta correlação entre si, e a exclusão da variável 'census', que representa uma mera identificação das observações, resultou em um modelo que, além de apresentar poder explicativo inferior (R² ajustado reduzido de 0.8306 para 0.5375), não cumpre com o pressuposto de linearidade exigido para o método de regressão paramétrico (o que pode ser corrigido ajustando o modelo novo para que resulte em alguma função que não seja a função afim), e não seria preferível ao invés do modelo geral se este não incluisse a variável 'census', que representa uma mera identificação das observações e não tem valor interpretativo*
+
+
+# Interpretação de modelos
+## 6. Correlação parcial
+Ainda utilizando os dados `Prestige`, podemos observar certa correlação entre as variáveis `prestige`, `income` e `education`:
+
+```{r}
+pre<-Prestige[c('prestige', 'income', 'education')]
+pairs(pre,
+      lower.panel = fcor,
+      upper.panel = flines)
+```
+E um pesquisador ficou em dúvida para ver o quanto do `prestige` dado pela educação (`education`) seria na verdade decorrente dos ganhos financeiros da profissão (`income`). Para isso ele utilizou o cálculo para as correlações parciais entre as variáveis `income`, `education` para explicar `prestige`:
+
+```{r}
+rho_parcial <- function(Y=Y, X1=X1, X2=X2){
+  rho_Y_X1 <- cor(Y, X1)
+  rho_Y_X2 <- cor(Y, X2)
+  rho_X1X2 <- cor(X1, X2)
+  rho_parcial_X1 <- (rho_Y_X1 -
+				 (rho_Y_X2*rho_X1X2))/
+				   sqrt(1-rho_X1X2^2)
+  return(rho_parcial_X1)  
+}
+prestige <- Prestige$prestige
+income <- Prestige$income
+education <- Prestige$education
+so_income <-rho_parcial(Y=prestige, X1=income, X2=education)^2
+so_education <- rho_parcial(Y=prestige, X1=education, X2=income)^2
+education_income <-cor(prestige, income)^2 - so_income
+nao_explicado <- 1- (so_income + so_education + education_income)
+
+t(data.frame(so_income, so_education, education_income, nao_explicado))
+
+```
+
+### Questão:
+Qual dos dois fatores (`education` e `income`) você julga mais importante para explicar `prestige`? Explique.
+
+**R**: *Embora a maior parte da variância (43,14%) de 'prestige' seja explicada por ambos fatotes 'income' e 'education', 'income' explica apenas 6,32%, sendo bem menos relevante que apenas 'education', que explica sozinho 31,93% da variância de 'prestige'.*
+
+## 7. Modelo sem interação
+
+O modelo entre `prestige` com `education` e `type` foi montado a seguir:
+
+```{r}
+mod_sem <- lm(prestige ~ type + education, Prestige)
+summary(mod_sem)
+```
+
+### Questão:
+Interprete os coeficientes colocados no `summary`.
+
+**R**: *O intercepto do modelo e o coeficiente relacionado ao tipo de profissão quando categorizado como 'prof' tiveram resultados indignificantes (p-valor maior que 0,05) e podem ser considerados como iguais a zero. Já os coeficientes relacionados ao tipo de profissão quando categorizado como 'White Collar' e a à variável 'education' apresentam-se como significantes; para cada ano médio estudado o prestígio da profissão tem mais 4,5728 pontos no escore, e reduz-se 5,4585 do escore caso a profissão seja classificada como 'White Collar'.*
+
+## 8. Modelo com interação
+O modelo entre `prestige` com `education` e `type` foi modificado, levando em consideração a interação a seguir:
+
+```{r}
+mod_com <- lm(prestige ~ type*education, Prestige)
+summary(mod_com)
+```
+
+### Questão:
+O que mudou entre o modelo `mod_sem` e `mod_com`? Explique
+
+**R**: *Acrescentando as interações entre as variáveis, apenas o coeficiente relativo à variável 'education' mostra-se significativa e não há alteração do poder explicativo do modelo analisando o R² ajustado.*
+
+## 9. Comparação entre os modelos
+
+```{r}
+anova(mod_sem, mod_com)
+```
+
+### Questão:
+Qual dos dois modelos você julga mais adequado? Explique.
+
+**R**: *Segundo a análise de variância comparando os modelos, eles não são significativamente distintos. Seguindo a sugestão do princípio da parcimônia, o primeiro modelo, por ser mais simples, é preferível a outro.*
+
+## 10. Usando `predict`
+
+A partir do seu modelo construído, preveja o prestígio `prestige` de uma profissão que não existia em 1971, mas que existe hoje: [Cientista de Dados](https://exame.abril.com.br/carreira/profissao-mais-sexy-do-seculo-21-segue-em-alta-no-brasil/), considerada a profissão mais *sexy* atualmente...
+Para isso, utilize os valores aproximados para essa profissao, construindo um `data.frame`. Os comandos a seguir já estão feitos:
+
+```{r}
+data_scientist <- data.frame(education = 14,#Fonte: https://goo.gl/jTZdzX 
+                             income = 19,1, #Fonte: https://goo.gl/yWcqBS e https://goo.gl/CNku38
+                             women = 1/3,   #Fonte: https://goo.gl/wxN543
+                             type = 'prof')
+```
+
+Agora, a partir do seu modelo (coloque o nome do seu modelo escolhido no lugar de `---` a seguir), responda qual seria o *prestígio* de um cientista de dados no ano de 1971.
+
+```{r}
+predict(mod_novo,  # Substitua --- pelo nome do modelo que julga melhor
+        data_scientist, 
+        interval = "confidence")
+```
+
+Para finalizar, uma última questão:
+
+### Questão:
+Você consegue encontrar uma equação de regressão que seja aceitável como estatisticamente significante, mas que não ofereça valor interpretativo para fins de gerenciamento? Explique.
+
+**R**: *Isso seria possível, acrescentando um número indeterminado de variáveis ao modelo e testanto-as, até que o modelo tenha um alto poder explicatvo, porém, sem que haja qualquer critério teórico ou lógico para que se prossiga com a inferência dos dados. Neste caso, independentemente do poder explicativo da equação de regressão, esta não oferece qualquer valor explicativo. No caso ocorrido no item 10, é utilizado uma função que trata apenas de valores de uma amostra que datam do ano de 1971, que, supõe-se, representam uma população de seu tempo; porém, embora o modelo aceite qualquer entrada de dados que apresente as mesmas variáveis, a equação não pode ser considerada um preditor para um item que compõe uma população diferente.*

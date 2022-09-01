@@ -1,0 +1,71 @@
+Aprendizado de máquinas
+	Supervisionado -> possui variável resposta: resultado de futura observação ou relação entre variáveis
+		Quantitativo - Regressão
+		Qualitativo - Classificação
+	Não-Supervisionado -> não possui variável resposta
+		Agrupamento de observações - Cluster
+		Agrupamento de variáveis - Análise de Componentes Principais
+
+Discriminação: encontrar o F
+Classificação: encontrar a fronteira
+
+	Suposições
+
+Linear:
+- As variáveis dos grupos são iguais
+- Fronteira linear
+
+Quadrática:
+- Cada grupo tem a sua média e sua variância
+- Ainda supõe que as variáveis seguem distribuição normal
+- Fronteira quadrática/parabólica
+
+	Teste de Box
+Testa se as variâncias são iguais (H0)
+	Multicolinearidade
+Utiliza-se a matriz de correlação
+As correlações ideais estarão entre 0,7 e -0,7.
+Variáveis redundantes não se mostram significante.
+	Métodos
+AIC
+BIC
+Forward
+Backward
+Regressão Lasso
+Ridge
+Best subset selection
+
+	Significância de variável
+
+	Lâmbida de Wilks
+O quanto a variável sozinha consegue discriminar os grupos.
+A razão entre a soma quadrada dos erros e a soma quadrada total diz o quanto a variável erra tentando fazer essa discriminação.
+A hipótese nula (uso do p-valor) assume que o lâmbida de Wilks é igual a 1, ou que a variável não é significantemente discriminatória.
+
+Autovalor
+Proporção de autovalor: o percentual da variância explicada pela variável F. A soma das proporções é 100% da variância.
+A soma das variâncias não considera 2*(cov)
+
+Matriz de fatores: correlações entre variáveis e fatores (interpretação de fatrores)
+
+Escores: valores dos fatores para cada observação.
+
+Centróides: média dos escores de cada grupo.
+{Scatterplot: gráfico com os escores, diferenciando os grupos por cores}
+Teste de significância dos fatores.
+
+	Avaliação de acertividade
+Data split: 75% da amostra é treino (utilizados para ajuste do modelo) e 25% para amostra teste.
+Cross-validation Leave-one-out (CVLOO): Deixar apenas uma observação como amostra teste; fazer o ajuste para cada amostra que ficou de fora; a taxa de erro da tabela confusão é dada com isso.
+   Vantagem: o resultado não é aleatório para uma mesma amostra
+   Vantagem: não se reduz tanto o tamanho da amostra.
+   Desvantagem: exige maior poder computacioinal
+
+	Procurar
+Teorema de Bayers
+Determinante de matriz
+Análise de sobrevivência
+Best subset selection (com interação)
+Problema de interação na lda
+scale: padronização no R
+Boosting

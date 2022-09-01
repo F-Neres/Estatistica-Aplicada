@@ -1,0 +1,92 @@
+				ANOVA de uma entrada
+	Princípio
+Verificar o grau de associação entre as observações associadas cada classificação de grupo de certa categoria.
+N: número de observações
+ng: número de observações dentro do grupo
+k: número de classificações
+
+	Pressupostos
+Resíduos (erros) devem seguir uma distribuição normal.
+Homogeneidade das variâncias: As contribuições das variâncias dos grupos devem ser equivalentes para a variância total.
+Amostras independentes: as observações de uma variável não podem influenciar as de outra, nem medidas podem ser repetidas.
+
+1 - Obter a média de cada grupo (G1, G2, G3... Gn) e a média geral de todas as observações.
+
+2 - Para cada observação, obter o desvio dentro do grupo e elevar ao quadrado.
+	SDw(Xn) = (Xn - "Média do grupo de Xn")²
+
+3 - Somar os valores de SDw de todas as observações (SSDw).
+
+4 - Para cada grupo, obter o desvio destes e elevar ao quadrado. Então, multiplica-se pelo total de observações do grupo (equivalente à SOMA do passo anterior).
+	SSDb = SOMA(ng("Média de Gn" - "Média Geral")²)
+
+5 - Obter a média dos quadrados dentro dos grupos. "Residual"
+	MSw = SSDw/dfw
+	dfw = N - k	gl2
+
+6 - Obter a média dos quadrados entre os grupos. "Categoria"
+	MSb = SSDb/dfb
+	dfb = k - 1	gl1
+
+7 - O valor F é a razão entre as médias dos quadrados dentro dos grupos e entre os grupos
+	F = MSb/MSw
+
+8 - O valor p é obtido a partir a partir do valor F, graus de liberdade 1 (k-1) e graus de liberdade 2 (N-k).
+
+	Interpretação
+MSb (categoria): Quanto maior a "média dos quadrados entre os grupos", mais dispersos os grupos são entre si
+MSw (Residual): Quanto maior a "média dos quadrados dentro dos grupos", mais dispersas as observações são dentro dos grupos.
+F: Quando maior o valor de F, maior a dispersão dos grupos em comparação com a dispersão das observações dentro dos grupos; logo, mais relevante a separação entre os grupos, ou os grupos não se mesclam tanto
+p-valor: Quanto maior o F, menor o p-valor. Um p-valor significante (abaixo da significância) indica que a hipótese nula de que os grupos são iguais é rejeitada.
+
+			ANOVA de duas entradas
+	Princípios
+Os dados estão em uma matriz, onde as linhas e colunas representam as classificações de cada categoria. Cada casela é composta de um grupo de observações.
+
+I: número de categorias da variável i
+J: número de categorias da variável j
+ni: número de observações em cada linha.
+nj: número de observações em cada coluna
+nij: número de observações em cada casela
+
+1 - Obter médias para:
+Cada uma das categorias da variável i (Mi)
+Cada uma das categorias da variável j (Mj)
+Cada uma das combinações entre ambas variáveis - caselas (Mij)
+Geral (M)
+	A quantidade de médias é dada por: I*J + I + J + 1
+
+2 - Obter a soma das diferenças ao quadrado (sum of squared differences - SSD) para a variável I (SSDi), a variável J (SSDj), a interação entre I e J (SSDij), os resíduos (SSDres) e o total (SSDgeral)
+2.1 - SSDi: para cada observação, subtrair a 'média da categoria i (linha) à qual pertence a observação'  da 'média geral' e elevar ao quadrado. Então, somar os resultados de todas as observações.
+	SSDi = ni * SOMAi(Mi - M)²	>>>  para amostras cujas observações sejam perfeitamente homogêneas.
+2.2 - SSDj: para cada observação, subtrair a 'média da categoria j (coluna) à qual pertence a observação'  da 'média geral' e elevar ao quadrado. Então, somar os resultados de todas as observações.
+	SSDj = nj * SOMAj(Mj - M)²	>>>  para amostras cujas observações sejam perfeitamente homogêneas.
+2.3 - SSDij: para cada observação, somar a 'média da combinação entre ambas as variáveis (casela) à qual pertence a observação' com a 'média geral', subtrair deste valor a 'média da categoria j (coluna) à qual pertence a observação' e a 'média da categoria i (linha) à qual pertence a observação'  e elevar ao quadrado. Então, somar os resultados de todas as observações.
+	SSDij = SOMAi SOMAj (Mij + M - Mi - Mj)²
+2.4 - SSDres: para cada observação, subtrair o 'valor da observação' da 'média da combinação entre ambas as variáveis (casela) à qual pertence a observação' e elevar ao quadrado. Então somar os resultados de todas as observações.
+	SSDres = SOMA i SOMAj (Xij - Mij)²
+2.5 - SSDgeral: para cada observação, subtrair o 'valor da observação' da 'média geral' e elevar ao quadrado. Então somar os resultados de todas as observações.
+	SSDgeral = SOMAi SOMAj (Xij - M)²
+2.6 - Deve-se respeitar a seguinte equação:
+	SSDgeral = SSDi + SSDj + SSDij + SSDres
+
+3 - Obter a média das diferenças ao quadrado (mean of squared differences) - variâncias - Dividindo cada 'soma das diferenças ao quadrado' pelo seu respectivo grau de liberdade.
+	MSDi = SSDi/(I - 1)
+	MSDj = SSDj/(J - 1)
+	MSDij = SSDij/((I - 1)*(J - 1))
+	MSDres = SSDres/(I*J*(nij - 1))
+	MSDgeral = SSDgeral/(n - 1)
+
+4 - Obter as estatísticas F.
+	Fi = MSDi/MSDres
+	Fj = MSDj/MSDres
+	Fij = MSDij/MSDres
+
+5 - Identificar o p-valor de acordo com a estatística F e os graus de liberdade que correspondem aos MSD que compõem o valor de F em questão.
+O grau de liberdade 2 corresponde ao dos resíduos.
+
+	Interpretação
+Fi e Fj: Quando maior o valor de F, maior a dispersão dos grupos em comparação com a dispersão das observações dentro dos grupos; logo, mais relevante a separação entre os grupos, ou os grupos não se mesclam tanto.
+Fij: Quanto maior o valor de F, maior a dispersão entre as caselas em comparação com a dispersão das observações dos grupos; logo, mais relevante a separação entre a combinação das variáveis, ou a interação entre as variáveis categóricas influencia nos agrupamentos.
+p-valor.i e p-valor.j: Quanto maior o F, menor o p-valor. Um p-valor significante (abaixo da significância) indica que a hipótese nula de que os grupos são iguais é rejeitada.
+p-valor.ij: Um p-valor significante indica que há influência de uma variável categórica sobre a interação de outra variável categórica e a variável contínua.

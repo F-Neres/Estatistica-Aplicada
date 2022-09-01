@@ -1,0 +1,24 @@
+Confiança - Precisão: da dispersão
+Consistência: reprodutividade
+
+
+	Validade de conteúdo
+Pode ser feito isso para determinar se uma questão pode ser colocada no questionário. Pergunta-se a um “especialista”.
+Define-se, a priori, se é possível associar uma variável mensurável com um construto.
+
+	Validade de Construto
+Comparando dois construtos, as questões devem ser associadas a apenas um construto, não ambos.
+Uma questão que mede ambos os construtos influenciará na associação destes.
+
+	
+
+
+
+
+
+
+
+
+Ajuste de definição: As duas características são:
+1 - relacionadas mas diferentes;
+2 - a mesma.

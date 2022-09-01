@@ -1,0 +1,305 @@
+---
+title: "Validação de Constructo"
+author: "Felipe Neres S. Bezerra"
+date: "6 de julho de 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages("irr")
+install.packages("psych")
+install.packages("dplyr")
+install.packages("psychometric")
+install.packages("semTools")
+install.packages("semPlot")
+install.packages("purrr")
+```
+
+```{r}
+library(irr)
+library(psych)
+library(dplyr)
+library(psychometric)
+library(semTools)
+library(semPlot)
+library(purrr)
+```
+
+
+
+As variáveis precisam ser numéricas.
+```{r}
+sme<-data.frame(Rater_A = c(1,2,3,2,1,1,1,2,3,3,2,1,1),
+                Rater_B = c(1,2,2,3,3,1,1,1,2,3,3,3,1),
+                Rater_C = c(1,3,2,3,2,1,1,1,2,3,2,3,1))
+```
+
+Matriz de Correlacao das notas dos experts
+```{r}
+cor(sme)
+```
+
+
+Porcentagem de concordancia dos experts; percentual de concordância entre os entrevistados.
+```{r}
+irr::agree(sme)
+```
+
+
+checar confiabilidade inter-rater 
+```{r}
+psych::cohen.kappa(sme)
+```
+
+
+2. Consistência interna
+
+A. Content Validity Ratio -> Validade do Conteudo
+
+B. Coeficiente Alfa
+
+Alfa de Cronbach é normalmente utilizado para medir a confiabilidade em uma unica dimensao. Para a nossa E.F.A. (), foram determinados que os itens 1-3, 4-6 e 7-8 são dimensoes dos dados de brand, sendo respecitvamente as dimensoes: "Qualidade do Produto" "Desejo de pagar" e "Diferenciação do Produto". Usaremos psych e dplyr para obtermos o alfa estandardizado.
+Vendo os nomes das variaveis que irao compor as variaveis latentes:
+
+```{r}
+brand<-read.csv("brand.csv")
+names(brand)
+```
+
+
+Vendo o alfa de todas as variaveis (sem distinção)
+```{r}
+psych::alpha(brand)$total$std.alpha
+```
+
+
+Criando novos data.frames para cada uma das três dimensoes e vendo o alpha de cada dimensao (verificando a concistência interna do construto):
+
+Dimensão Qualidade (p_quality):
+
+```{r}
+p_quality <- dplyr::select(brand, c(well_made, consistent, poor_workman_r))
+psych::alpha(p_quality)$total$std.alpha
+```
+
+Dimensão Desejo (p_wilingness):
+```{r}
+p_willingness <- dplyr::select(brand, c(higher_price, lot_more, go_up))
+psych::alpha(p_willingness)$total$std.alpha
+```
+
+Dimensao Diferencial (p_difference):
+```{r}
+p_difference <- dplyr::select(brand, c(stands_out, unique))
+psych::alpha(p_difference)$total$std.alpha
+```
+Muito alto. As duas variáveis mensuradas podem estar medindo a mesma coisa.
+
+O valor do alfa deve ser positivo, variando entre 0 e 1, tendo as seguintes leituras:
+Superior a 0,9 - consistência muito grande, as variáveis estão próximas de serem a mesma. Considere retirar variavel.
+Entre 0,8 e 0,9 - muito boa Entre 0,7 e 0,8 - razoável
+Entre 0,6 e 0,7 - fraca
+Inferior a 0,6 - inadmissível. considere retirar variavel
+
+
+
+C. Split-half
+
+Dividir as variáveis ao meio e verificar se as variáveis se comportam da mesma maneira.
+
+O Split-half se comporta de maneira semelhante (mesma escala de consistencia de 0 a 1):
+```{r}
+brand_8<-dplyr::select(brand, -c(one_of_a_kind))
+splitHalf(brand_8)
+```
+Average split half reliability            =  0.86
+
+Separando "na unha".
+```{r}
+# Get averages of even and odd row scores
+even_items <- colMeans(brand_8[,c(FALSE,TRUE)])
+odd_items <- colMeans(brand_8[,c(TRUE,FALSE)])
+
+# Correlate scores from even and odd items
+cor(even_items, odd_items)
+```
+
+Os escores de alfa de Cronbach e de split-half tendem a se comportar na mesma maneira. Porém, a confiabilidade split-half não é o mais apropriado para multiplos constructos ao mesmo tempo.Portanto, o uso de alfa de Cronbach é a medida padrao de confiabilidade para consistência interna.
+
+
+3. Estabilidade
+
+A. Teste-reteste
+
+Utilizaremos dados fabricados de 2 tempos de opiniao
+A função describeBy() do pacote psych retorna estatística descritia agrupada por uma variavel categorica. Por isso o uso da variavel time como segundo argumento da função.
+```{r}
+set.seed(42)
+brand_t1_t2<-data.frame(id=c(1:70),
+                        time=c(rep(1,70),rep(2,70)),
+                        acabamento = rbinom(140,2,0.5)+1,
+                        consistencia = rbinom(70,2,0.5)+1,
+                        preco = rbinom(70,2,0.5)+1)
+# Descriptive statistics grouped by 'time'
+psych::describeBy(brand_t1_t2, "time")
+```
+
+
+testRetest() precisa dos registros de t1 e t2 e o ID como argumentos. Use filter do pacote dplyr para separar o data.frame em t1 e t2, e argumento ID ser igual a id.
+```{r}
+test_retest <- psych::testRetest(t1 = filter(brand_t1_t2, time == 1),
+                                  t2 = filter(brand_t1_t2, time == 2),
+                                  id = "id")
+#Existe dependência do entrevistado - id
+```
+
+```{r}
+test_retest
+```
+
+Obtenha a correlação escalonada ao longo do tempo, armazenado em r12 do output do objeto gerado pelo testRetest().
+```{r}
+test_retest$r12
+```
+
+
+Validade
+
+"Um teste é válido se de fato mede o que supostamente deve medir."
+
+A santíssima trindade da validade é composta pela Validade de Conteúdo (uma variável observada/medida representa uma variável latente?), Validade de Constructo (pode ser convergente e divergente) e Validade de Critério (pode ser a preditiva e convergente).
+
+1. Conteudo
+Avalia quão bem uma técnica/instrumento mede um constructo teórico.
+
+A. Content Validity Ratio (CVR)
+
+CVratio() usa dois argumetos: NTOTAL é o total de experts, e NESSENTIAL que é o numero de experts que classificam o item como "Essential".
+
+$$CVR = \frac{N_{essential} - (N_{total})/2}{(N_{total})/2}$$
+
+NTOTAL é a contagem de valores unicos em expert NESSENTIAL é a soma de notas Essential para cada item.
+Especialistas A, B e C.
+```{r}
+conteudo <- data.frame(item=c(1, 1, 1,
+                            2, 2, 2,
+                            3, 3, 3,
+                            4, 4, 4,
+                            5, 5, 5),
+                       expert = factor(c("A", "B", "C",
+                                     "A", "B", "C",
+                                     "A", "B", "C",
+                                     "A", "B", "C",
+                                     "A", "B", "C"),
+                                   levels=c("A","B","C")),
+                       rating = factor(c("Essential", "Useful", "Not necessary",
+                                     "Useful", "Not necessary", "Useful",
+                                     "Not necessary", "Not necessary", "Essential",
+                                     "Essential", "Useful", "Essential",
+                                     "Essential", "Essential", "Essential"), 
+                                   levels=c("Not necessary","Useful","Essential")))
+
+# Calcular o CVR para cada item no data.frame
+
+conteudo %>% 
+  group_by(item) %>% 
+  summarize(CVR = CVratio(NTOTAL = length(unique(expert)),
+                      NESSENTIAL = sum(rating == 'Essential')))
+```
+
+# A tibble: 5 x 2
+   item    CVR
+  <dbl>  <dbl>
+1     1 -0.333
+2     2 -1    
+3     3 -0.333
+4     4  0.333
+5     5  1    
+
+A variável 5 é 100% essencial, segundo os especialistas. A variável 4 é essencial para 2/3 dos especialistas.
+
+
+Esses itens variam bastante na validade de conteúdo, desde consenso unanime até nao consenso absoluto. Essa medida ajuda a determinar a força de cada item na coleta de dados.
+
+2. Constructo
+
+A. Validade Convergente e Validade Discriminante
+
+MEE
+```{r}
+brand_rep_factors<- data.frame(
+  factor = as.factor(c("QUAL","QUAL","QUAL",
+                       "PRICE","PRICE","PRICE",
+                       "UNIQUE","UNIQUE")),
+  item=c("consistent","well_made","poor_workman_r",
+         "go_up","lot_more","higher_price",
+         "stands_out","unique"))
+
+brand_rep_8_cfa_model<-"QUAL =~ consistent+well_made+poor_workman_r
+PRICE =~go_up+lot_more+higher_price
+UNIQUE =~ stands_out+unique"
+
+brand_rep_8_CFA<-lavaan::cfa(model=brand_rep_8_cfa_model, data=brand_8)
+
+# Summarize results with fit measures and standardized estimates
+summary(brand_rep_8_CFA, fit.measures=T, standardized=T)
+```
+
+Para ver se o constructo apresenta validade Convergente e/ou Discriminante, a função reliability do pacote semTools consegue fornecer esses indicios. Para isso, observar os valores de omega (que devem ser maiores de 0.9 para indicar convergência) e avevar para mostrar que é discriminante (deve ser maior do que 0.5 para ser discriminate).
+```{r}
+# Construct validity
+semTools::reliability(brand_rep_8_CFA)
+```
+
+alpha é Alfa de Cronbach
+
+omega1 é calculado por:
+
+$$\omega_{1} = \frac{(\Sigma^k_{i=1}.\lambda_{i})^2.Var(\psi)}{(\Sigma^k_{i=1}.\lambda_{i})^2.Var(\psi)+ \Sigma^k_{i=1}.\theta_{ii} + 2.\Sigma_{i<j}.\theta_{ij}} $$
+
+sendo, $\lambda_{i}$ Ã© a carga fator (laoding factor) do item $i$, $\psi$ Ã© a variÃ¢ncia do fator, $\theta_{ii}$ Ã© a variÃ¢ncia das medidas de erro do item i, e $\theta_{ij}$ Ã© a covariÃ¢ncia das medidas de erros dos itens $i$ e $j$. ([Raykov, 2001](http://doi.org/10.1348/000711001159582))
+
+`omega2` Ã© calculado por:
+
+$$\omega_{2} = \frac{(\Sigma^k_{i=1})^2.Var(\psi)}{1'\hat \Sigma1}$$
+
+sendo, $\hat \Sigma$ a matriz de covariÃ¢ncia do modelo aplicado e **1** Ã© o vetor k-dimensional de 1. $\omega_{1}$ e $\omega_{1}$ mostrarÃ£o valores diferentes se hÃ¡ cargas que se cruzam (*cross-loadings*) ou fatores de mÃ©todos (*method factors*). Caso contrÃ¡rio, o modelo apresenta uma estrutura simples.
+
+$$\omega_{3} = \frac{(\Sigma^k_{i=1}.\lambda_{i} )^2.Var(\psi)}{1'\hat \Sigma1}$$
+
+E por Ãºltimo, `avevar` refere-se ao *average variance extracted*, sendo calculado por:
+
+$$AVE = \frac{1'diag(\Lambda \Psi \Lambda')1 }{1'diag(\hat\Sigma)1} $$
+
+FÃ³rmula modificada de [Fornell & Larcker (1981)](http://doi.org/10.2307/3151312)
+
+
+
+3. Criterio
+A. Preditiva
+Validade preditiva é estabelecida com base na regressão de resultados futuros em nosso constructo estabelecido. Nós analisamos a força da validade preditiva na mesma maneira que qualquer regressao linear (coeficientes da regressao, p-valores e coeficiente de determinação - R2).
+Para isso, o exemplo utilizará o argumento ~ para falar que uma variável segue um modelo linear de outras variáveis - Construir o modelo e construir o grafico:
+
+```{r}
+modelo<-"F1 =~ well_made + consistent + poor_workman_r
+         F2 =~ higher_price + lot_more + go_up
+         F3 =~ stands_out + unique + one_of_a_kind
+         F1 ~~ F3
+         F2 ~ F1 + F3"
+brand_rep_sem<-lavaan::cfa(model=modelo, data=scale(brand))
+semPlot::semPaths(brand_rep_sem, rotation = 2)
+```
+
+
+"Seguir em 'validity_aula'"
+
+
+
+
+
+
+

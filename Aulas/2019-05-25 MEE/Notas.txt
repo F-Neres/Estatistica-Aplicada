@@ -1,0 +1,51 @@
+		Modelo de Equações Estruturais
+
+Variáveis latentes + variáveis observáveis
+Variáveis latentes: fatores da análise fatorial
+
+Combinação de análise fatorial com regressão.
+
+
+	Vantagem em relação à regressão
+Obtem-se as dependências entre as variáveis de forma individual, par-a-par
+
+	Modelo identificável
+Modelo passível de explicação
+ Tamanho da amostra
+ n° de parâmetros a serem estimados; q
+   variâncias de cada variável e os coeficientes de regreção de cada par de variável
+q < p(p+1)/2
+
+
+	Passos
+Especificação: diagrama de caminhos
+Identificação: relação p e q
+Estimação
+Avaliação de ajuste do modelo
+Reespecificação do modelo
+
+Qui-quadrado avalia a igualdade entre as matrizes de covariância.
+CFI - Tende a ficar melhor quanto mais complexo for o modelo.
+
+
+	Reespecificação do modelo.
+Se o modelo não estiver bem ajustado, verificar se há outras relações possivelmente significativas não consideradas no modelo
+Índice de modificação (mi)
+  H0: associação (caminho) nula;
+  H1: associação (caminho) significativa.
+Estatística mi: qui-quadrado
+  Rejeita H0 se mi >= 3,84 (1,96²)
+  Testar o modelo com essa associação para verificar a significância.
+
+		R
+Y ~ X : Y depende de X; regressão.
+Y ~~ X : X e Y estão associados; correlação.
+Y =~ Y : Y é um fator medido por X; análise fatorial direcionada.
+
+
+
+Índice de modificação:
+
+```{r}
+View(as.data.frame(summary(mfitmoda?, modindices = TRUE)))
+```

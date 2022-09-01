@@ -1,0 +1,104 @@
+---
+title: "Exercício extra"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+      Exercício: Felicidade
+
+Medidas do grau de felicidade de pessoas em relação à família e de maneira geral além de escore indicando a liberdade do país onde mora, o grau de confiança do governo (corrupção), generosidade da população, economia do país (renda per capita), saúde (expectativa de vida) e indicação de hemisfério onde mora
+
+Modelos
+A: felicidade geral ~ hemisfério
+B: felicidade geral ~ economia + família + saúde + liberdade + governo + generosidade
+
+```{r}
+dados.felicidade.2015 <- read.csv2("C:/Users/logonlb/Desktop/MEE/Dados/dados-felicidade-2015.csv")
+View(dados.felicidade.2015)
+```
+
+Carregando pacote
+```{r}
+library(lavaan)
+```
+
+
+  Modelo A
+
+
+Identificação do modelo
+
+```{r}
+qA <- 2 #Como é um modelo de regressão, o modelo faz p-valor, mas não tem demostra os valores de ajuste
+pA <- 3
+```
+q = df
+
+Especificação do modelo
+```{r}
+mdlA <- 'Happiness.Score ~ Hemisphere'
+```
+
+Estimação do modelo
+```{r}
+modfitA <- sem(mdlA, data= dados.felicidade.2015, std.lv = TRUE)
+summary(modfitA)
+```
+
+Com o modelo padronizado, é mostrada a correlação ao invés da variância.
+```{r}
+standardizedSolution(modfitA, type='std.all')
+```
+
+Verificação da qualidade do ajuste do modelo
+```{r}
+summary(modfitA, fit.measures = TRUE)
+```
+Felicidade = -0.745 se Hemisfério = Sul.
+
+  Modelo B
+
+Especificação do modelo
+```{r}
+mdlB <- 'Happiness.Score ~ Economy..GDP.per.Capita. + Family + Health..Life.Expectancy. + Freedom + Trust..Government.Corruption. + Generosity'
+```
+
+Identificação do modelo
+ q = 7
+df = p(p+1)/2 = 7*8/2 = 28
+iDENTIFICÁVEL
+
+Estimação do modelo
+```{r}
+modfitB <- sem(mdlB, data= dados.felicidade.2015, std.lv = TRUE)
+summary(modfitB)
+```
+Generosidade não foi significativo.
+
+Verificação de necessidade de escalonamento
+```{r}
+vartable(modfitB)
+```
+As variâncias das variáveis explicativas é "próxima"
+
+Verificação da qualidade do ajuste do modelo
+```{r}
+summary(modfitB, fit.measures = TRUE)
+```
+
+
+Modelo sem "Generosidade".
+Especificação do modelo
+```{r}
+mdlB2 <- 'Happiness.Score ~ Economy..GDP.per.Capita. + Family + Health..Life.Expectancy. + Freedom + Trust..Government.Corruption.'
+```
+
+Estimação do modelo
+```{r}
+modfitB2 <- sem(mdlB2, data= dados.felicidade.2015, std.lv = TRUE)
+summary(modfitB2)
+```
+

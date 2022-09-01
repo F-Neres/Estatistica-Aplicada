@@ -1,0 +1,66 @@
+---
+title: "Untitled"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Exercício 2
+
+Criando o banco de dados
+```{r}
+dados.alimentacao <- read.csv2("C:/Users/logonlb/Desktop/MEE/Dados/dados-alimentacao.csv")
+```
+
+Carregando pacote
+```{r}
+library(lavaan)
+```
+
+
+Especificação do modelo
+```{r}
+modelo1 <- 'Q ~ P + D'
+```
+
+Estimação do modelo
+```{r}
+modfit1 <- sem(modelo1, data = dados.alimentacao, std.lv = TRUE)
+summary(modfit1)
+```
+```{r}
+standardizedSolution(modfit1, type='std.all')
+```
+
+
+Verificação das variâncias
+```{r}
+varTable(modfit1)
+```
+
+Comparação com a regressão
+```{r}
+modfitlm <- lm(Q~P+D, data = dados.alimentacao)
+summary(modfitlm)
+```
+
+
+##Exercício 5 - Verificação da qualidade do ajuste do modelo
+
+```{r}
+summary(modfit1, fit.measures = TRUE)
+```
+Qui-quadrado = 
+CFI = 1; Se maior que 0,8, então ok.
+TLI = 1; ajuste perfeito.
+RMSEA = 0; necessário abaixo de 0,05.
+SRMR = 0; necessário abaixo de 0,05.
+
+
+AIC e BIC são usados apenas em comparação entre os modelos.
+
+
+
+

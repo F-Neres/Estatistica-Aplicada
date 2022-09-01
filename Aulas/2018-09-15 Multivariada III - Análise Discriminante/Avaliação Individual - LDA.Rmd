@@ -1,0 +1,189 @@
+---
+title: "Avaliação Individual - Multivariada III - LDA"
+author: "Felipe Neres Silva Bezerra"
+date: "30 de setembro de 2018"
+output: html_document
+---
+# Linear Discriminant Analysis - LDA
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+    Antes de começar a avaliação, perceba que ela está dividida em cinco passos principais: "Dados", "Pressupostos", "Estimação", "Interpretação" e "Validação"
+    Existem linhas de comando em R que devem ser alteradas (substituir ---) e questões para serem respondidas (1 a 8).
+    Cada passo bem executado vale 2 pontos.
+    Não se esqueça de colocar o seu nome no cabeçalho desse arquivo. Esse arquivo pode ser enviado ao meu [email](jvmelis@gmail.com) até 30/09/2018.
+    Boa Prova!
+
+
+## Passo 1. Leitura dos dados:
+  
+  A) Leitura dos dados `treino`
+
+Dados `treino` estão no arquivo `training.csv` que pode ser obtido nesse [link](https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping)
+
+```{r}
+treino <- read.csv("training.csv", sep=",")
+treino <- treino[,1:10]
+summary(treino)
+```
+Dados `teste` estão no arquivo `testing.csv` que pode ser obtido nesse [link](https://archive.ics.uci.edu/ml/datasets/Forest+type+mapping)
+
+```{r}
+teste <- read.csv("testing.csv", sep=",")
+teste <- treino[,1:10]
+summary(teste)
+```
+
+  C) Avaliar se os dois dados (`treino` e `teste`) apresentam as mesmas proporções
+
+```{r}
+table(treino$class)
+table(teste$class)
+```
+
+### Questão 1: Explique porque devemos verificar se as variáveis métricas se encontram em escalas parecidas? O que podemos fazer para que as escalas sejam semelhantes?
+
+**R**: *Ainda que as funções discriminantes possam separar os grupos utilizando variáveis métricas de proporções e escalas distintas, posteriormente, os pesos discriminantes não refletirão apenas a importância de cada variável métrica na discriminação de cada grupo, mas também as diferenças de escalas entre as variáveis, o que impossibilitaria fazer uma interpretação correta da estrutura das funções discriminantes depois que o modelo é criado.*
+
+### Questão 2: Explique o(s) motivo(s) de usarmos um grupo de dados para treino e outro para teste?
+
+**R**: *No procedimento de validação cruzada, a amostra de treino é utilizada para criar o modelo de LDA, enquanto a amostra de teste é utilizado apenas para verificar se o modelo é significante para discriminando observações distintas. Utilizar uma mesma amostra para criar e testar o modelo torna-o suceptível a um sobreajuste (overfitting), quando o modelo retorna bons resultados de ajuste que condizem apenas à amostra, mas que não necessariamente seria eficaz para discriminar novos indivíduos.*
+*Quando o pressuposto de igualdade das matrizes de variância-covariância dos grupos é rompido, há o risco de que observações sejam super-classificadas nos grupos com matrizes de covariância maiores. Ainda assim, pode-se dar prosseguimento ao modelo, mas torna-se imprescindível o processo de validação cruzada.*
+
+
+## Passo 2. Seleção de variáveis independentes e Pressupostos:
+  
+  A) Avaliar a Colienaridade das variáveis independentes.
+
+```{r, include=FALSE}
+if(!require(GGally)){install.packages("GGally")}
+```
+
+Use os gráficos a seguir para fazer uma análise sintética das relações:
+
+```{r}
+ggp <- GGally::ggpairs(treino, aes(color=class))
+print(ggp, progress = F)  
+```
+  
+  B) Avaliar a Multinormalidade das variáveis indepedentes em relação aos grupos
+  
+```{r include=FALSE}
+if(!require(biotools)){install.packages("biotools")}
+```
+
+Para isso, execute o Teste M de Box e veja se os dados seguem 
+
+```{r}
+biotools::boxM(treino[,-1],treino$class)
+```
+  
+
+### Questão 3: Há alguma inconformidade desses pressupostos? Explique.
+
+**R**: *Há alta correlação entre as variáveis b2 e b3 e entre as variáveis b8 e b9; uma vez que o comportamento de uma variável pode ser explicada por outra à qual está altamente correlacionada, uma delas poderia ser descartada do modelo. Já o teste M de Box indica que as matrizes de variância-covariância dos grupos são significantemente diferentes (mesmo para os padrões comumente indicados para este teste, de ?? = 0,001); entretanto, mesmo rompendo com este pressuposto, o modelo pode ser válidado com a validação cruzada.*
+
+
+### Questão 4: Você tem alguma sugestão de análise alternativa a ser feita? Explique seu ponto de vista.
+
+**R**: *Outra exigência da análise discriminante linear é que as variáveis independentes sigam distribuição normal. A avaliação da normalidade das variáveis preditoras pode ser feita visualmente, analisando os gráficos de comparação com quantis de uma distribuição normal teórica (Q-Q Norm.), ou através do teste de Shapiro Wilk.*
+
+
+## Passo 3. Estimação e Avaliação das Funções Discriminantes:
+
+```{r}
+if(!require(MASS)){install.packages('MASS')}
+mod <- MASS::lda(class ~ . , data = treino)
+
+```
+
+
+  A) Escores das funções discriminantes
+
+```{r}
+mod
+```
+
+  B) Correlações das funções discriminantes com as variáveis explicativas
+
+```{r}
+mod$scaling
+```
+
+  C) Avalie o ajuste do modelo usando tabela confusão com os valores previstos e reais dos dados "teste". 
+
+```{r}
+previstos.treino <- predict(mod)$class
+reais.treino <-  treino$class
+tabela.treino <- table(previstos.treino, reais.treino)
+tabela.treino
+```
+
+### Questão 5: A partir desses resultados, existe algum espectro (b1-b9) sozinho que consegue discriminar entre os tipos florestais? Explique.
+
+**R**: *Não há uma só variável preditora que possua a capacidade de discriminar todos os grupos, pois em cada função discriminante as variáveis mais correlacionadas mudam. A variável que melhor discrimina os grupos separados pelas funções LD1 e LD3  é o espectro b2, porém, é a variável de menor relevância na discriminação feita pela função LD2.*
+
+  
+## Passo 4. Interpretação das Funções Discriminantes:
+
+  A) Avaliar os centroides
+
+```{r}
+escores<-predict(mod, treino)$x
+resulta<-data.frame(predict(mod, treino)$x,
+                    class = predict(mod,treino)$class)
+centroides <-data.frame(
+  LD1=tapply(resulta$LD1, resulta$class, mean),
+  LD2=tapply(resulta$LD2, resulta$class, mean),
+  LD3=tapply(resulta$LD3, resulta$class, mean))
+
+centroides
+```
+
+  B) Verificando se os centroides são significativamente distintos entre si
+
+```{r}
+summary.aov(manova(escores ~ treino$class))
+```
+
+  C) Gráfico dos dois primeiros eixos da LDA:
+
+```{r}
+ggplot(resulta, aes(x=LD1, y=LD2, color=class))+
+  geom_point(size=4)+
+  stat_ellipse()+
+  geom_point(data=centroides, aes(x=LD1, y=LD2), color="black",size=8, shape=3)+
+  theme_classic()+
+  geom_hline(yintercept = 0)+
+  geom_vline(xintercept = 0)
+```
+
+### Questão 6: Interprete os resultados: Quais grupos são bem distintos? Quais aparentam ser mais semelhantes? Explique.
+
+**R**: *Todos os grupos são significantemente distintos, já que todas as funções foram significantemente bem-sucedidas na discriminação dos grupos. De acordo com a análise gráfica das funções discriminantes e dos escores dos centroides, a primeira função encarregou-se de separar os grupos "d" e "o" dos grupos "h" e "s"; as outras duas funções separaram o grupo "d" do grupo "o" e o grupo "h" do grupo "s".*
+
+
+## Passo 5: Testar o modelo com os dados de teste (validação cruzada)
+
+```{r}
+previstos.teste <- predict(mod,teste)$class
+reais.teste <- teste$class
+tabela.teste <- table(previstos.teste, reais.teste)
+tabela.teste
+mean(
+  diag(tabela.teste)/
+  table(reais.teste)
+  ) 
+```
+
+### Questão 7: A função discriminante foi bem sucedida em separar as classes usando as variáveis independentes? 
+
+**R**: *O modelo de análise discriminante foi capaz de classigicar corretamente 94% das observações de uma amostra diferente daquela que o originou; uma acurácia elevada o bastante para que se afirme que a função discriminante foi bem sucedida em separar as classes.*
+
+### Questão 8: Quais as vantagens e desvantagens da regressão logística em relação a análise discriminante?
+
+**R**: *A regressão logística não comporta variáveis dependentes categóricas com mais de dois grupos, somente variáveis binárias, ao contrário da análise discriminante.*
+*Entretanto, a regressão logística aceita tanto variáveis métricas quanto categóricas (adaptando-as como variáveis dummy, como pode ser feito nos modelos de regressão linear), além de não depender de pressupostos como igualdade entre as matrizes de variância-covariância ou linearidade das variáveis preditoras.*
+*Quando a variável dependente é composta por apenas dois grupos, é preferível que se utilize a regressão logística, devido a robustez do modelo.*

@@ -1,0 +1,388 @@
+---
+title: "ANOVA 1 e 2 fatores"
+author: "Prof J van Melis"
+date: "29 de abril de 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## ANOVA
+
+Com o objetivo de comparar as médias entre dois ou mais grupos, a ANOVA (análise de variância, do inglês **AN**alysis **O**f **VA**riance) é uma boa opção.
+
+Ela é um teste paramétrico, portanto:
+ 
+ * Leva em consideração os parâmetros das amostras: média e desvio-padrão
+ * A distribuição dos dados a serem comparados devem seguir distribuição normal
+ * Além disso, os dados contínuos (mensurados) devem apresentar homocedasticidade (variâncias semelhantes) entre os grupos comparados
+
+A fórmula geral da ANOVA é relacionar uma variável dependente contínua (variável quantitativa contínua) com uma variável qualitativa (ordinal ou categórica). Portanto, se a sua variável $Y$ resposta (dependente) for uma variável contínua (numérica) e você quer relacionar com uma variável independente que é qualitativa ($X$), a ANOVA pode ser uma boa opção.
+
+$$Y \sim X$$
+
+Sendo:
+$X$ Fator (ordinal ou categórico)
+$Y$ Numérico ($\sim N (\mu, \sigma^2)$)
+
+ANOVA também é um **teste de hipóteses**, como o teste t de Student, e a hipótese nula a ser testada é:
+**H0**: As médias são iguais entre as categorias do fator analisado;
+E a hipótese alternativa é:
+**H1**: Uma ou mais médias se distingue entre as categorias do fator analisado.
+
+Ou seja, quando o seu teste de hipótese apontar um *p-valor* baixo (normalmente o $\alpha$ é de 5%, ou seja, se p-valor < 5%), podemos rejeitar H0 e aceitamos a H1.
+
+Ao rejeitarmos a H0, inferimos que a variável categórica tem influência na variação da média da variável contínua (numérica) analisada.
+
+Por exemplo, você quer analisar se a variável contínua [pressão sanguínea](https://www.mdsaude.com/2014/08/pressao-arterial-normal.html) (também chamada de **pressão arterial**, divide-se em dois valores *sistólica* e *diastólica*) varia entre as categorias da variável **dieta** (no caso, temos três categorias: *veganos*, *vegetarianos* e *onívoros*).
+
+$$Pressao \sim Dieta$$
+
+Para esse *"estudo"*, utilizaremos somente a pressão sistólica, que é o maior valor quando nós mensuramos a nossa pressão (a popular 12/8), mas em unidades de mm/Hg.
+A H0 portanto é:
+As medías das pressões entre as três categorias do fator **dieta** é igual  
+$$\mu_{veganos} = \mu_{vegetarianos} = \mu_{onívoros}$$
+
+Para esse teste, utilizaremos valores aleatórios que serão gerados a seguir no [R](https://cran.r-project.org/) (linhas de comando a seguir):
+
+```{r}
+set.seed(42)
+dados <-  data.frame(dieta = c(rep("vegano", 30),
+                              rep("vegetariano", 30),
+                              rep("onivoro", 30)),
+                     sistole = c(115+rnorm(30, sd=5),
+                                 120+rnorm(30, sd=4),
+                                 125+rnorm(30, sd=10)))
+```
+
+Lembre-se que esses dados foram totalmente gerados de maneira aleatória por um professor que defende um consumo menor de carne (mas que gosta de queijo)!
+
+Para efetuar o teste, avalie os pressupostos do teste com os seus dados:
+
+1. Distribuição normal.
+
+```{r}
+tapply(X = dados$sistole,
+      INDEX = dados$dieta,
+      FUN = shapiro.test)
+```
+Os três grupos seguem distribuição normal segundo o teste de Shapiro-Wilk (não rejeitamos a hipótese nula de que os dados seguem distribuição normal, p>0.05).
+
+
+2. Verificar homocedasticidade dos dados
+
+```{r}
+tapply(X = dados$sistole,
+      INDEX = dados$dieta,
+      FUN = var)
+```
+
+Olhando os dados, não há nenhum que apresenta variância  4 vezes maior que a variância de outro grupo.
+
+Podemos executar um teste de variância, podendo ser o teste de Bartlett:
+
+```{r}
+bartlett.test(sistole ~ dieta, dados)
+```
+Pelo teste de Bartlett, que é bem rígido, rejeitamos a nossa hipótese nula de que as variâncias são iguais.
+
+    O que fazer nesse caso?
+
+3. Verifique se os dados estão balanceados.
+Eles devem apresentar tamanhos amostrais semelhantes:
+
+```{r}
+table(dados$dieta)
+```
+
+4. Executar ANOVA
+
+Podemos executar pelo R por quatro principais maneiras:
+A. Usando a função `aov()` diretamente, depois vendo o seu `summary()`:
+
+```{r}
+anova_a<-aov(sistole ~ dieta, dados)
+anova_a
+summary(anova_a)
+```
+
+B. Usando a função `aov()` em objeto `lm`, que é construído a partir da função `lm()`, depois vendo o quadro resumo com a função `summary()`:
+
+```{r}
+mod <- lm(sistole ~ dieta, dados)
+anova_b<-aov(mod)
+summary(anova_b)
+```
+
+C. Usando a função `anova()` no objeto `lm`
+
+```{r}
+anova_c <- anova(mod)
+anova_c
+```
+
+D. Usando função `Anova()` do pacote `car` em um objeto da classe `lm`:
+
+```{r}
+if(!require(car)){install.packages('car')}
+anova_d<-Anova(mod)
+anova_d
+```
+
+A função `car::Anova` executa teste do Tipo "II", também podendo executar do tipo "III". Esse tipo de testes são interessantes quando os dados estão desbalanceados. Mais nesse [link]()
+
+Em todos os resultados o nosso teste foi significativo (p-valor<0.0001), logo **rejeitamos H0**. Portanto, assumimos a hipótese de que a *dieta* tem influência nos valores médios da pressão *sistólica*, pois as suas médias se diferem.
+
+
+5. Analisando seus resíduos. É interesse realizar um diagnóstico do teste também:
+
+A. Analise se os resíduos apresentam médias em torno do **zero** (linha vermelha deve estar paralela);
+B. Analise se a variância dos resíduos estão uniformemente distribuídos (amplitude dos pontos)
+C. Observe valores que são mostrados no R. Isso indica possíveis *outliers*, sendo os números as linhas em que eles estão localizados na sua tabela (nesse caso: `18`, `81` e `85`):
+
+```{r}
+plot(anova_a, which=1)
+```
+
+D. Avalie se os resíduos seguem distribuição normal:
+
+```{r}
+plot(anova_a, which=2)
+```
+
+Onde podemos perceber que os resíduos não mostram uma distribuição tão próxima da normal, pois os menores valores (mais próximos do canto inferior esquerdo) estão afastados da reta da distribuição normal esperada (linha tracejada da diagonal). Mas o teste de Shapiro-Wilk (`shapiro.test()`) dos resíduos (extraídos pela função `residuals()` no objeto `anova_a`) mostra que os resíduos possuem uma distribuição normal (p>0.05):
+
+```{r}
+shapiro.test(residuals(anova_a))
+
+```
+
+6. Se o teste foi significativo, execute um teste *post hoc*. O mais conhecido e utilizado é o teste de Tukey HSD (*honestly significant differences*).
+
+No nosso caso, o nosso teste foi significativo, pois $F_{2, 87} = 26.083$, com p-valor = $1.35~ 10^-9$, sendo bem menor que o $\alpha$ tradicional (nível de significância, porcentagem de erro tipo I aceitável) de 5% . Portanto, podemos executar o Teste *post hoc* para verificar **quais médias são diferentes entre si**.
+
+```{r}
+TukeyHSD(anova_a)
+```
+$$HSD = X_{a}-X_{b}/\sqrt(SSD_{within}/n)  $$
+
+E você pode visualizar o teste, com seus valores *upper* e *lower* de confiança:
+
+```{r}
+plot(TukeyHSD(anova_a))
+```
+Como nenhum dos intervalos está cruzando a linha da diferença igual a zero (linha tracejada na vertical), as diferenças entre os grupos (`vegano`,`vegetariano` e `onivoro`) do fator `dieta` apresentam médias distintas de pressão `sistolica`, entre todos (nenhuma média é igual a outra média)
+
+para visualizar o resultado final podemos utilizar o pacote `ggplot2`, que permite uma grande variedade de gráficos bonitos:
+
+```{r}
+if(!require(ggplot2)){install.packages("ggplot2")}
+
+ggplot(dados, aes(x=dieta, y=sistole, fill=dieta))+
+  geom_boxplot()+theme_classic()+ylab("Pressão sistólica (mmHg)")+
+  scale_fill_manual(values = c("red", "green", "yellow"))+
+  xlab("Tipo de dieta")
+```
+
+
+Logo, podemos concluir que as médias da pressão sistólica variam conforme a dieta da pessoa ( $F_{2, 87} = 26.083$, p-valor<0.0001), onde suas médias são significativamente 
+
+# ANOVA dois fatores (ANOVA two-way)
+
+Vamos supor que você desconfie que exista mais uma interferência para a variação da média da pressão sistólica, que seria o `sexo` da pessoa (`masculino` ou `feminino`).
+
+Criaremos uma coluna a mais, denominada `sexo`, onde existirão pessoas do sexo masculino e feminino. Seguirá uma distribuição binomial com probabibilidade 50% de ser `masculino` ou `feminino`.
+
+```{r}
+set.seed(05)
+dados$sexo<-rbinom(n=90, size=1, prob=0.5)
+dados$sexo <- ifelse(dados$sexo==1, "masculino", "feminino")
+```
+
+E será efetuado uma ANOVA com dois fatores:
+
+$$Y_{contínua} \sim X1_{fator} + X2_{fator} + X1:X2 $$
+
+Sendo $X1:X2$ a interação entre os fatores $X1$ e $X2$.
+
+
+Seguiremos os seguintes passos:
+
+1. Verificamos se os fatores se encontram balanceados:
+
+```{r}
+table(dados$dieta, dados$sexo)
+```
+
+Parece estar balanceado. Para nos certificarmos disso, executaremos um teste de $\chi^2$:
+
+```{r}
+chisq.test(table(dados$dieta, dados$sexo))
+```
+
+O teste deu não significativo (p=0.4909), logo não rejeitamos a nossa hipótese nula de que **as frequências são iguais**
+
+2. Testar a normalidade dos dados para ambos os sexos (para o fator `dieta` já havia sido realizado):
+
+```{r}
+tapply(X = dados$sistole,
+       INDEX = dados$sexo,
+       FUN = shapiro.test)
+```
+
+3. Testar a homocedasticidade dos dados para ambos os sexos (para o fator `dieta` já havia sido realizado):
+
+```{r}
+tapply(X = dados$sistole,
+       INDEX = dados$sexo,
+       FUN = var)
+```
+A variância de `masculino` foi até o dobro da variância de `feminino` (*rule of thumb* de 4 vezes foi honrada).
+
+```{r}
+bartlett.test(sistole ~ sexo, dados)
+```
+
+
+4. Executar ANOVA
+
+Para testar a interação entre fatores, você pode escrever o código da `formula` no R de duas maneiras:
+
+a) `sistole ~ dieta + sexo + dieta:sexo`
+ou
+b) `sistole ~ dieta*sexo`
+Ambos serão entendidos da mesma maneira, mas lembre-se que se você quiser analisar uma ANOVA com um **modelo aditivo**, é só retirar a porção da interação da `formula`, dessa maneira:
+`sistole ~ dieta + sexo`
+
+
+Da mesma maneira que para ANOVA *one-way*, com dois fatores também pode ser executada de 4 maneiras, mas observe que se os dados estiverem desbalanceados, a função `Anova()` do pacote `car` pode resultar em resultados diferentes, principalmente se não houver interação entre os fatores:
+
+```{r}
+anova_I <- aov(sistole ~ dieta*sexo, dados)
+summary(anova_I)
+```
+
+Para simplificar, será mostrado a mais somente pela função `car::Anova()`
+
+```{r}
+mod<-lm(sistole ~ dieta*sexo, dados)
+anova_II<-car::Anova(mod)
+anova_II
+```
+
+Como dito anteriormente, como o design do experimento se encontra balanceado, os três tipos de ANOVA (tipo I, II e III) dão o mesmo resultado, com exceção do Tipo III para o fator `sexo`, com um valor de `F` menor, mas ainda não significativo:
+
+```{r}
+mod<-lm(sistole ~ dieta*sexo, dados)
+anova_III<- car::Anova(mod, type="III")
+anova_III
+```
+
+5. Avaliar os resíduos:
+
+```{r}
+par(mfrow=c(1,2))
+plot(anova_I, which=c(1,2))
+```
+
+Visualizando os dois gráficos, tudo OK!
+
+6. Teste *post hoc*
+Neste caso, não haveria necessidade de executar um teste post hoc, pois para o fator `sexo` ($$F_{1,84} = 0.163$$ ) e para a interação entre `sexo:dieta` $$F_{2,84} = 2.321 $$ **não** houve resultado significativo. De qualquer maneira, faremos o teste *post hoc* para que visualize como é o resultado de um teste *post hoc* com dois fatores e com interação:
+
+```{r}
+TukeyHSD(anova_I)
+```
+
+Um pouco confuso? É porque os pares analisados serão: (i) `onivoro:feminino` com `vegano:feminino`; (ii) `onivoro:feminino` com `vegetariano:feminino`; (iii) `onivoro:feminino` com `onivoro:masculino`;... (xv) `vegano:masculino` com `vegetariano:masculino`.
+
+Para facilitar, existe o pacote `lsmeans`, onde tem a função `cld()`, que facilita o pareamento, mostrando os grupos que podem ser construídos, descrevendo-os com letras (usando argumento `Letters=letters` para usar letras minúsculas, ou `Letters=LETTERS` para letras maísculas, ou use o *default* da função, que coloca números para os grupos formados).
+
+Para isso, será necessário:
+1. Construir um modelo (`mod`) com a função `lm()`
+2. Fazer o teste de Tukey (`adjust = "tukey"` ), descrevendo os pares que serão analisados (`pairwise ~ dieta:sexo`) usando a função `lsmeans()` do pacote `lsmeans`
+4. Use a função `cld()` do pacote `lsmeans` para descrever 
+
+```{r}
+if(!require(lsmeans)){install.packages("lsmeans")}
+
+mod <- lm(sistole ~ dieta*sexo, data= dados)
+resultado_tukey <- lsmeans(mod, 
+                   pairwise ~ dieta:sexo, 
+                   adjust="tukey")           ### Comparacao ajustada Tukey
+cld(resultado_tukey,
+    alpha=0.05,           ### Nivel de significancia da diferença dos grupos
+    Letters=letters,      ### Usa letras caixa baixa para cada grupo
+    adjust="tukey")       ### Comparacao ajustada de Tukey
+
+```
+
+O `resultado_tukey$contrasts` é igual se você tivesse executado com a função `TukeyHSD()`:
+
+```{r}
+resultado_tukey$contrasts
+```
+Vendo somente o resultado da interação:
+
+```{r}
+TukeyHSD(anova_I)$`dieta:sexo`
+```
+
+Para visualizar, usaremos novamente o `ggplot`:
+
+```{r}
+p<-ggplot(dados, aes(x=dieta, y=sistole, fill=sexo))+
+  geom_boxplot()+theme_bw()
+p
+```
+E você pode completar, descrevendo no gráfico quais grupos foram formados, baseando-se nos resultados do `cld()`:
+
+```{r}
+p+annotate("text", label=c("bc","c",  # onivoro m e f
+                            "a","a",  # vegano m e f
+                            "ab","ab"), # vegetariano m e f
+           x=c(0.8, 1.2, 1.8, 2.2, 2.8, 3.2), y=145) # para posicionar as letras
+```
+Lembre-se que o teste da interação **não foi significativo**, portanto, **não é correto colocar as letras dos agrupamentos segundo a interação!**
+
+O gráfico correto seria:
+
+```{r}
+p+annotate("text", label=c("c",  # onivoro m e f
+                            "a",  # vegano m e f
+                            "b"), # vegetariano m e f
+           x=c(1, 2, 3), y=145) # para posicionar as letras
+```
+
+Onde somente o fator `dieta` apresentou diferença significativa.
+
+# Agora faça você mesmo
+
+## ANOVA one way:
+
+1. Leia o arquivo
+2. Analise o balanceamento da amostragem para o fator `size`
+3. Verifique se os dados `use` seguem a distribuição normal entre as categorias de `size`
+4. Verifique a homocedasticidade da variável `use` em relação ao fator `size`
+5. Execute ANOVA *one way*, onde a variável `use` ~ `size`
+6. Avalie os resíduos do teste.
+7. Conclua sobre a ANOVA. Deve ser executado um teste *post hoc*?
+8. Se for necessário, execute um teste *post hoc*.
+9. Conclua.
+10. Construa um gráfico *boxplot*
+
+## ANOVA two way
+
+1. Leia o arquivo
+2. Analise o balanceamento da amostragem entre os fatores `size` e `type`
+3. Verifique se os dados `use` seguem a distribuição normal para os fatores supracitados
+4. Verifique a homocedasticidade da variável em relação aos fatores `size` e `type`
+5. Execute ANOVA *two way* `use` ~ `size` + `type` + `size:type`
+6. Avalie os resíduos do teste.
+7. Conclua sobre a ANOVA. Deve ser executado um teste *post hoc*?
+8. Se for necessário, execute um teste *post hoc*.
+9. Conclua.
+10. Construa um gráfico *boxplot*
+

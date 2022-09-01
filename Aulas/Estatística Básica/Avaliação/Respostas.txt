@@ -1,0 +1,23 @@
+  1)
+
+a)152 apartamentos, 76 por bloco, 4 por andar em cada bloco.
+
+b)FEITO (Histograma)
+
+c)FEITO (Boxplot)
+
+d)	            Bloco A	    Bloco B
+Média           53,42236842	48,40657895
+Mediana	        53,2	      48,55
+Moda	          54,1	      47,5
+Desvio Absoluto	1,445775623	1,272022161
+Variância	      3,139092982	2,36515614
+Desvio Padrão	  1,771748566	1,537906415
+
+Os dados estão razoavelmente concentrados próximos da mediana, que coincide encontra-se também próxima da média em ambos os blocos.
+
+e)
+As medidas de posição mediana e média da área útil dos apartamentos do bloco A encontram-se próximas do que é especificado na escritura, de 53m²; ademais, os dados parecem mais concentrados em torno desse valor. Já no bloco B, as mesmas medidas apontam para apartamentos com área útil de cerca de 48m² a 49m², abaixo do especificado.
+
+f)
+

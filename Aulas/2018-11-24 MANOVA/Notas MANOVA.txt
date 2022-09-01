@@ -1,0 +1,5 @@
+Há uma dependência entre as variáveis resposta.
+
+: O vetor para as médias das variáveis são iguais
+
+soma dos quadrados dos erros tipo I, II e III

@@ -1,0 +1,67 @@
+KMO: percentual da variância que pode se explicada por variável latente.
+
+Métodos de extração de fatores mais comuns (e exigidos no curso)
+ Componentes principais + rotação
+ Eixos principais
+ Máxima verossimilhança
+
+Variável complexa: variável composta por mais fatores; possui mais fatores com cargas altas.
+
+
+	Interpretação
+
+Carga fatorial é a correlação entre o fator e a variável original
+O sinal da carga pode indicar o agrupamento das variáveis.
+A variância (autovalor) do fator é a soma dos quadrados das cargas.
+A proporção da variância do fator dentro da variância total dá a proporção de variância explicada
+  A variância total acaba sendo o número de variáveis (com a da "autocorrelação")
+A proporção de variância explicada pode ser acumulada a cada fator "adicionado".
+Comunalidade: percentual da covariância das variáveis explicadas. Soma dos quadrados das cargas para cada variável original.
+  Variáveis com comunalidade baixa (?) mostram-se menos relevantes
+  Confiabilidade dos indicadores (das variáveis)
+Escore fatorial é o valor do fator para cada observação
+
+Usar pelo menos 60% e proporção de variância acumulada.
+
+Rotação: a comunalidade e a soma da variância explicada se mantêm, mas a variância explicada por cada fator se altera.
+
+
+
+
+	Passo 1: Condições para utilização
+n>=50
+n/p>=5
+-0,3 =< correlação >= 0,3
+KMO - medida do percentual de variabilidade vindo de fator latente
+  KMO >= 50%
+  bom se 70%
+  ótimo se 80% ou mais
+Teste de esfericidade de bartlett
+  H0: correlações nulas; H1: correlações não nular
+  Rejeitando H0 (p-valor < 0,05), utilizar o AFE
+
+	Passo 2: Seleção de fatores
+  O total de fatores é P
+  Extração por componentes principais
+Critério de Kaiser: fatores com autovalores maiores que 1
+Critério de variância acumulada: mínimo de 0,6
+Critério gráfico - Scree Plot:
+  cortar o gráfico quando houver um caimento alto ou ficar horizontal
+
+	Passo 3: Extração dos fatores
+ACP: Análise de componentes principais
+  comum, normalmente melhor se rotacionada
+Eixos principais: busca o fator comum, mais indicada se dados não são normais
+Máxima verossimilhança
+  mais indicado se os dados forem normais
+
+	Passo 4: Interpretação
+Rotacional para melhorar a interpretação
+  Ortogonal: fatores independentes (varimax)
+  Oblíqua: fatores correlacionados (oblimin)
+Cargas fatoriais: correlações entre fatores e variáveis -> identificar o que é o fator
+Comunalidade: percentual da variância explicada de cada variável
+
+
+	Alguns comandos no R
+na.omit(dados_personalizados) #omitir dados faltantes

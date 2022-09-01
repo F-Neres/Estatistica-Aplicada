@@ -1,0 +1,90 @@
+##     Notas
+#Objetos iniciados com letra maiúscula devem ser substituidos
+#Vetor é uma coluna de com diversos números concatenados, ou uma variável.
+#Dataframe é um grupo de vetores, com observações/indivíduos identificados pela ordem das linhas.
+
+##     Tratamento dos dados
+#Referenciar um vetor em um grupo de dados
+dataset$vetor
+#criar um vetor
+c(n1,n2,n3,n4...ni)
+#criar um objeto
+nome_do_objeto <- informação
+#Remover uma coluna de um dataframe
+DATAFRAME <- subset(DATAFRAME, select = -VETOR)
+
+##     Recursos
+#Baixar e instalar pacote
+install.packages('nome_no_pacote')
+#Abrir pacote
+require(nome_no_pacote)
+
+##    Binomial
+#Probabilidade de K sucessos
+dbinom(x = k, size = n, prob = p)
+#Probabilidade de no mínimo K sucessos (X>=K)
+dbinom(x = k, size = n, prob = p) + pbinom(q = k, size = n, prob = p, lower.tail = FALSE)
+pbinom(q = k-1, size = n, prob = p, lower.tail = FALSE)
+#Probabilidade de no máximo K sucessos (X<=K)
+pbinom(q = k, size = n, prob = p, lower.tail = TRUE)
+
+##    Medidas Resumo
+#Média
+mean(dataset$Vetor)
+#Variância
+var(dataset$Vetor)
+#Desvio Padrão
+sd(dataset$Vetor)
+#Mediana, Quartis, Máximo e Mínimo
+summary(dataset$Vetor)
+#Média
+aggregate(dataset$Vetor,by=list(dataset$Seletor),FUN = mean, na.rm=TRUE)
+#Desvio Padrão
+aggregate(dataset$Vetor,by=list(dataset$Seletor),FUN = sd, na.rm=TRUE)
+
+
+##    Tabela
+#Contagem
+table(dataset$Vetor)
+table(dataset$Vetor1,dataset$Vetor2)
+#Frequência
+prop.table(table(dataset$Vetor))
+prop.table(table(dataset$Vetor1,dataset$Vetor2))
+#considerar céculas em branco
+,useNA = 'always'
+
+##    Tabela de dupla entrada
+# 100% fixado no total (toda a tabela soma 100%)
+prop.table(table(estudo_cardio$SEXO, estudo_cardio$ETIOLOGIA))
+# 100% fixado nas linhas (todas as linhas somam 100%)
+prop.table(table(estudo_cardio$SEXO, estudo_cardio$ETIOLOGIA), 1)
+# 100% fixado nas colunas (todas as colunas somam 100%)
+prop.table(table(estudo_cardio$SEXO, estudo_cardio$ETIOLOGIA), 2)
+
+##    Histograma
+#Frequência relativa
+hist(dataset$Vetor, breaks = X, freq = TRUE, main='Título do gráfico', xlab='Título do eixo X', ylab='Título do eixo Y/Frequência Relativa')
+#Densidade de frequência
+hist(dataset$Vetor, breaks = X, freq = FALSE, main='Título do gráfico', xlab='Título do eixo X', ylab='Título do eixo Y/Densidade de Frequência')
+
+##    Boxplot
+boxplot(dataset$VetorY)
+boxplot(dataset$VetorY~dataset$VetorX,main='Título do gráfico')
+#boxplot(Y~X)
+
+##    Regressão
+#Gerar um modelo linear com duas variáveis
+lm(VETOR_Y ~ VETOR_X, data=DATAFRAME)
+#... para vetores indexados com caracteres especiais:
+lm(DATAFRAME$VETOR_Y ~ DATAFRAME$VETOR_X, data=DATAFRAME)
+#Recomenda-se criar um objeto que contenha o modelo linear
+MODELO_LINEAR <- lm(VETOR_Y ~ VETOR_X, data=DATAFRAME)
+#Instalar e carregar pacote para testes de regressão linear
+install.packages('lmtest')
+require(lmtest)
+#Teste de Breusch-Pagan
+bptest(MODELO_LINEAR)
+
+##    Regressão Logística
+#Gera um modelo logístico
+glm(VETOR_Y ~ VETOR_X1 + VETORX2 + VETOR_X3, family=binomial, data=DATAFRAME)

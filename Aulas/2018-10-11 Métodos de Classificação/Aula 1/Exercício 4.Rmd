@@ -1,0 +1,240 @@
+---
+title: "Exercício 4"
+author: "Neres Bezerra"
+date: "20 de outubro de 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+  4) A planilha dados.cereais.xlsx contém dados sobre cereais matinais produzidos por três diferentes fabricantes americanos: General mills (G), Kellog (k) e Quaker (Q). Assuma que os dados seguem Normal Multivariada com uma matriz de cobariância comum. Queremos discriminar os três fabricantes com as variáveis Calorias, Proteína, Gordura, Sódio, Fibra, Carboidratos, Açúcar e Potássio. Responda:
+  
+  a) Quais variáveis discriminam melhor os grupos?
+  
+  
+  b) Antes de realizar a análise, quantas funções discriminantes você obterá?
+  c) Determine e interprete as funções discriminanes. Avalie também a significância das funções e comente.
+  d) Parece que algum fabricante está associado com mais "cereais nutritivos"(maior quantidade de proteína e fibra, menores quantidades de gordura e açúcar e assim por diante) do que outros?
+  e) Construa o gráfico dos cereais no espaço bidimensional discriminante usando diferentes símbolos para identificar os três fabricantes. Interprete.
+
+_________________________________________________________________________________________________________________
+
+
+Instale e carregue os pacotes
+
+```{r}
+install.packages("foreign")
+install.packages("MASS")
+install.packages("dplyr")
+install.packages("biotools")
+install.packages("DiscriMiner")
+install.packages("ggplot2")
+install.packages("mvnormtest")
+
+library(foreign)
+library(MASS)
+library(dplyr)
+library(biotools)
+library(DiscriMiner)
+library(ggplot2)
+library(mvnormtest)
+```
+
+
+_________________________________________________________________________________________________________________
+
+Carregue os dados
+
+*Import Dataset \ From Excel
+O comando 'View' é em caixa alta
+
+É preciso remover as colunas de índice e marca
+*Foi criado "dados..cereais" para que, caso executada mais de uma vez, não remova mais colunas que o necessário.
+Scale padroniza as variáveis para que tenham média 0 e variância 1.
+```{r}
+dados..cereais <- dados_cereais[,-1]
+dados._cereais <- dados..cereais[,-1]
+dados.cereais <- dados._cereais[,-10]
+
+dados.cereais[,-1] <- scale(dados.cereais[,-1])
+```
+
+
+```{r}
+summary(dados.cereais)
+table(dados.cereais)
+View(dados.cereais)
+```
+
+_________________________________________________________________________________________________________________
+
+Matriz de Correlação
+Apenas as colunas 2 a 3, já que a coluna 1 é categórica.
+
+```{r}
+cor(dados.cereais[,-1])
+```
+
+
+_________________________________________________________________________________________________________________
+
+Suposição de normalidade
+Teste de shapiro wilk
+Remova a coluna 1, já que ela é categórica
+
+```{r}
+mshapiro.test(t(dados.cereais[,-1]))
+```
+Teste de Shapiro Wilk rejeitado.
+
+_________________________________________________________________________________________________________________
+
+Igualdade das variâncias
+Teste M de Box
+
+```{r}
+boxM(data = dados.cereais[, -1], grouping = dados.cereais$Fabricante)
+```
+As covariâncias são heterogêneas.
+
+__________________________________________________________________________________________________________
+
+Seleção das variáveis
+Medidas de qualidade
+
+```{r}
+discPower(variables = dados.cereais[,-1], dados.cereais$Fabricante)
+```
+
+            correl_ratio wilks_lambda F_statistic    p_value
+Calorias      0.14806547    0.8519345   3.4759823 0.04056247
+Proteina      0.01087741    0.9891226   0.2199405 0.80353063
+Gordura       0.14955798    0.8504420   3.5171822 0.03916465
+Sodio         0.18981557    0.8101844   4.6857374 0.01484834
+Fibra         0.08004525    0.9199548   1.7401997 0.18850780
+Carboidrato   0.17120440    0.8287956   4.1314022 0.02338561
+Acucar        0.05503357    0.9449664   1.1647730 0.32234994
+Potassio      0.02812905    0.9718709   0.5788639 0.56516077
+
+_________________________________________________________________________________________________________________
+
+  *Ajuste das funções discriminantes*
+
+Modelo discriminante linear
+```{r}
+discrim_4.1 <- desDA(variables = dados.cereais[, c("Calorias", "Proteina", "Gordura", "Sodio", "Fibra", "Carboidrato", "Acucar", "Potassio")], 
+                   group = dados.cereais$Fabricante)
+discrim_4.1
+```
+
+
+Coeficientes das funções discriminantes
+```{r}
+discrim_4.1$discrivar
+```
+DF1 = 0,07Calorias -0,59Proteina +0,424Gordura -0,187Sodio -1,268Fibra -1,18Carboidrato -1,302Acucar +0,857Potassio
+Mais associado negativamente a Fibra, Carboidrato e Açúcar.
+
+DF2 = -0,925Calorias +0,316Proteina Gordura Sodio Fibra Carboidrato Acucar Potassio
+Mais associado a Fibra (negaticamente) e a potássio.
+
+Autovalores das funções discriminantes e variabilidade explicada
+```{r}
+discrim_4.1$values
+```
+
+
+Matriz de fatores para interpretação
+```{r}
+discrim_4.1$discor
+```
+Correlação entre as variáveis explicativas e a variável discriminante.
+DF1 tem maior correlação negativa com Calorias, Sódio e Carboidrato.
+DF2 tem maior correção positiva com Sódio.
+
+Centróides
+```{r}
+dados.cereais$DF1 <- discrim_4.1$scores[,1]
+dados.cereais$DF2 <- discrim_4.1$scores[,2]
+dados.cereais %>% group_by(Fabricante) %>% summarise(C1 = mean(DF1), C2 = mean(DF2))
+```
+
+# A tibble: 3 x 3
+  Fabricante     C1     C2
+  <chr>       <dbl>  <dbl>
+1 G           0.210  0.830
+2 K          -0.897 -0.483
+3 Q           2.39  -0.742
+
+Quanto maior o valor da variável discriminante do centroide , maior a influência das variáveis explicativas mais associadas àquela variável discriminante sobre o grupo representado pelo centroide.
+Basear-se prioritariamente na matriz de correlação de fatores.
+
+
+
+
+
+
+
+
+Scatterplot
+```{r}
+library(ggplot2)
+ggplot(data = dados.cereais, aes(x = DF1, y = DF2, colour = Fabricante)) +
+  geom_hline(yintercept = 0, colour="gray70") +
+  geom_vline(xintercept = 0, colour="gray70") +
+  geom_point()
+```
+
+_________________________________________________________________________________________________________________
+
+Avaliação do ajuste
+Testes da significância das funções discriminantes
+Classificação real
+
+```{r}
+Y_real.4 <- dados.cereais$Fabricante
+
+escores.4 <- discrim_4.1$scores
+mod.4 <- lm(escores.4 ~ Y_real.4)
+summary(mod.4)
+```
+
+
+_________________________________________________________________________________________________________________
+
+
+Classificação - Funções de classificação
+
+Ajuste total
+```{r}
+fit.4 <- linDA(variables = dados.cereais[, c("Calorias", "Proteina", "Gordura", "Sodio", "Fibra", "Carboidrato", "Acucar", "Potassio")], 
+             group = dados.cereais$Fabricante)
+fit.4
+```
+
+
+Ajuste com cross-validaton
+```{r}
+fit2.4 <- linDA(variables = dados.cereais[, c("Calorias", "Proteina", "Gordura", "Sodio", "Fibra", "Carboidrato", "Acucar", "Potassio")], 
+             group = dados.cereais$Fabricante, validation = 'crossval')
+fit2.4
+```
+
+```{r}
+fit2q.4 <- quaDA(variables = dados.cereais[, c("Calorias", "Proteina", "Gordura", "Sodio", "Fibra", "Carboidrato", "Acucar", "Potassio")], 
+             group = dados.cereais$Fabricante, validation = 'crossval')
+fit2q.4
+```
+
+
+Ajuste com amostras treinamento/teste
+```{r}
+treinamento.4 <- sample(seq_len(nrow(dados.cereais)), size = 183) #75% dos dados
+teste.4 <- setdiff(seq_len(nrow(dados.cereais)), treinamento)
+fit3.4 <- linDA(variables = dados.cereais[, c("Calorias", "Proteina", "Gordura", "Sodio", "Fibra", "Carboidrato", "Acucar", "Potassio")], 
+              group = dados.cereais$Fabricante, validation = 'learntest', learn = treinamento.4,
+              test = teste.4)
+```
+

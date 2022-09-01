@@ -1,0 +1,345 @@
+---
+title: "Avaliação - MEE"
+author: "Felipe N. S. Bezerra"
+date: "28 de maio de 2019"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Em dados_moda_sustentavel.csv encontram-se os resultados da aplicação de um questionário sobre a opinião de 260 pessoas acerca da moda sustentável em 35 questões. Além disso, também foram coletadas variáveis de controle como idade, gênero, escolaridade e renda.
+
+Acredita-se que algumas questões estão associadas a variáveis latentes dadas abaixo:
+
+Conhecimento de moda sustentável: questões 6, 7 e 8;
+Confiança no mercado de moda atual: questões 9, 10 e 11;
+Apoio a causas ambientais e animais: questões 12, 13, 14 e 15;
+Apoio a causas sociais: questões 16, 17 e 18;
+Realce do status: questões 20, 21 e 22;
+Sacrifício pessoal: questões 23, 24 e 25;
+Percepção de eficácia: questões 26, 27 e 28;
+Consciência de preço: questões 29, 30 e 31;
+Resistência à mudança questões 32 33 e 34;
+Atitude questões 35 36 37 e 38;
+Intenção de compra questões 39 40 e 41.
+
+O estudo consiste em avaliar a significância das variáveis na formação
+dos construtos e ainda verificar se:
+
+A atitude depende de conhecimento, confiança, apoio a causas
+ambientes e animais, apoio a causas sociais, realce, consciência de
+preço, sacrifício pessoal, percepção de eficácia e resistência à mudança;
+
+A intenção de compra depende da atitude, do gênero, da idade, da
+escolaridade e da renda
+
+Observação: Re-categorize as variáveis de controle para melhor entendimento. As questões podem ser vistas no arquivo questoes_moda_sustentavel.doc
+
+
+
+As quatro variáveis categóricas estão modificadas em variáveis discretas da seguinte forma:
+
+	Idade
+1 - 17 a 20
+2 - 21 a 24
+3 - 25 a 30
+4 - 31 a 35
+5 - 36 ou mais
+
+	Gênero
+0 - Feminino
+1 - Masculino
+
+	Escolaridade
+1 - Ensino fundamental
+2 - Ensino médio incompleto
+3 - Ensino médio completo
+4 - Ensino superior incompleto
+5 - Ensino superior completo
+6 - Mestrado
+
+	Renda
+1 - Até 4 salários mínimos (R$ 3.816)
+2 - De 4 a 10 salários mínimos (R$ 3.816 a 9.540)
+3 - De 10 a 20 salários mínimos (R$ 9.540 a 19.080)
+4 - Mais de 20 salários mínimos (a cima de R$ 19.080)
+
+A cada ajuste, procurou-se proceder com a remoção de parâmetros. Quando todos os parâmetros são considerados significantes, então o ajuste é realizado com o intuito de adicionar alguma relação anteriormente excluida; para isso, verifica-se os maiores índices de modificação de parâmetros não mais inclusos no modelo. E, seguindo a intenção do modelo a priori, a inclusão de parâmetros foi direcionado à composição e relação causal dos constructos.
+
+  Critério de remoção de parâmetro:
+Coeficiente de regressão ou carga de fator menos significante (maior p-valor) dentre os superiores a 0,1. Como trata-se de uma pesquisa social, tentou-se manter o modelo flexível, apontando apenas divergências mais críticas da hipótese inicial.
+
+  Critério de adição de parâmetro:
+Regressão que não cause recursividade ou redundância
+Composição por variável latente que não crie variáveis complexas
+Maior valor de índice de modificação, desde que superior a 3,84 (conforme recomendado)
+
+
+Criando o banco de dados
+```{r}
+library(readxl)
+setwd("D:/Documentos/Estatística/Aulas/2019-05-25 MEE/Avaliação")
+dados_moda <- read_excel("D:/Documentos/Estatística/Aulas/2019-05-25 MEE/Avaliação/moda_rc.xlsx")
+View(dados_moda)
+```
+
+Instalando e Carregando pacotes:
+
+
+```{r message=FALSE, warning=FALSE, paged.print=FALSE}
+library(lavaan)
+library(semPlot)
+```
+
+
+Especificação do modelo inicial:
+```{r}
+mee_moda0 <- 'conhecimento =~ Q6 + Q7 + Q8
+confianca =~ Q9 + Q10 + Q11
+apoio.ambiental.animal =~ Q12 + Q13 + Q14 + Q15
+apoio.social =~ Q16 + Q17 + Q18
+status =~ Q20 + Q21 + Q22
+sacrificio =~ Q23 + Q24 + Q25
+eficacia =~ Q26 + Q27 + Q28
+preço =~ Q29 + Q30 + Q31
+resistencia =~ Q32 + Q33 + Q34
+atitude =~ Q35 + Q36 + Q37 + Q38
+intençao.compra =~ Q39 + Q40 + Q41
+atitude ~ conhecimento + confianca + apoio.ambiental.animal + apoio.social + status + preço + sacrificio + eficacia + resistencia
+intençao.compra ~ atitude + GENERO + IDADE + ESCOLARIDADE + RENDA'
+```
+
+Identificação do modelo:
+  35 parâmetros das relações fatoriais
+  14 parâmetros das relações causais
+  55 covariâncias entre fatores
+  35 variâncias
+q = 139
+p = 35(35+1)/2 = 630
+O modelo é identificável.
+
+Estimação do modelo inicial:
+```{r}
+mfitmoda0 <- sem(mee_moda0, data = dados_moda, std.lv = TRUE)
+summary(mfitmoda0)
+```
+
+Diagrama de caminhos
+```{r}
+semPaths(mfitmoda0)
+```
+
+
+Avaliação do ajuste do modelo
+```{r}
+summary(mfitmoda0, fit.measures = TRUE)
+```
+
+  P-value (Chi-square)                         = 0.000
+Há discrepância entre as matrizes de covariância.
+
+  Índice de comparação de ajuste (CFI)         = 0.828
+Em comparação com um modelo nulo, o ajuste foi considerado bom.
+
+  Índice de Tucker Lewis (TLI)                 = 0.806
+Atribuindo uma penalidade de acordo com os graus de liberdade do modelo, o ajuste ainda é considerado adequado.
+
+  Raiz do Erro Quadrático Médio de Aproximação = 0.057
+  P-value RMSEA <= 0.05                        = 0.011
+Observando a diferença média entre a covariância observada e a do modelo, o ajuste aproxima-se de estar plenamente adequado (<0,05)
+
+  Raiz quadrada média residual                 = 0.088
+De acordo com a diferença padronizada entre a matriz de correlação observada e a matriz de correlação ajustada; os resíduos foram próximos dos esperados de um ajuste ideal.
+
+  Akaike (AIC)                                 = 23188.188
+  Bayesian (BIC)                               = 23615.470
+Os critérios Bayesiano e de Akaike serão utilizados como referência para observar a melhora nos próximos ajustes.
+
+
+A cerca das significâncias dos parâmetros do caminhos estipulados, a questão 29 ("Eu não estou disposto a ter um esforço extra para continuar buscando uma camiseta com preço menor") foi a única variável que não pode ser determinado pelo fator que o compõe ("Conciência de preço"). Quanto às regressões, apenas os coeficientes da variável observada "Idade" e da variável latente "Atitude" foram significantemente diferentes de zero, que determinaram a variável latente "Intenção de compra"; as demais relações de regressão não foram significantes.
+
+
+
+O próximo modelo exclui o coeficiente de regressão de "Apoio a causas ambientais e animais" como causa da "Atitude" (p-valor = 0.921).
+
+Especificação do modelo:
+```{r}
+mee_moda1 <- 'conhecimento =~ Q6 + Q7 + Q8
+confianca =~ Q9 + Q10 + Q11
+apoio.ambiental.animal =~ Q12 + Q13 + Q14 + Q15
+apoio.social =~ Q16 + Q17 + Q18
+status =~ Q20 + Q21 + Q22
+sacrificio =~ Q23 + Q24 + Q25
+eficacia =~ Q26 + Q27 + Q28
+preço =~ Q29 + Q30 + Q31
+resistencia =~ Q32 + Q33 + Q34
+atitude =~ Q35 + Q36 + Q37 + Q38
+intençao.compra =~ Q39 + Q40 + Q41
+atitude ~ conhecimento + confianca + apoio.social + status + preço + sacrificio + eficacia + resistencia
+intençao.compra ~ atitude + GENERO + IDADE + ESCOLARIDADE + RENDA'
+```
+
+
+Estimação do modelo
+```{r}
+mfitmoda1 <- sem(mee_moda1, data = dados_moda, std.lv = TRUE)
+summary(mfitmoda1, fit.measures = TRUE)
+```
+
+De acordo com a significância do teste qui-quadrado, o índice de comparação de ajuste (CFI), o índice de Tucker Lewis (TLI), a raiz do erro quadrático médio de aproximação e a raiz quadrada média residual, não houve mudança relevante no segundo ajutes.
+Comparando com os critérios de Akaike e Bayesiano, houve uma melhora inexpressiva (redução dos critérios em 0,008% e 0,023%, respectivamente).
+
+
+O próximo modelo exclui o coeficiente de regressão de "escolaridade" como causa da "intenção de compra" (p-valor = 0,803).
+
+Especificação do modelo:
+```{r}
+mee_moda2 <- 'conhecimento =~ Q6 + Q7 + Q8
+confianca =~ Q9 + Q10 + Q11
+apoio.ambiental.animal =~ Q12 + Q13 + Q14 + Q15
+apoio.social =~ Q16 + Q17 + Q18
+status =~ Q20 + Q21 + Q22
+sacrificio =~ Q23 + Q24 + Q25
+eficacia =~ Q26 + Q27 + Q28
+preço =~ Q29 + Q30 + Q31
+resistencia =~ Q32 + Q33 + Q34
+atitude =~ Q35 + Q36 + Q37 + Q38
+intençao.compra =~ Q39 + Q40 + Q41
+atitude ~ conhecimento + confianca + apoio.social + status + preço + sacrificio + eficacia + resistencia
+intençao.compra ~ atitude + GENERO + IDADE + RENDA'
+```
+
+
+Estimação do modelo:
+```{r}
+mfitmoda2 <- sem(mee_moda2, data = dados_moda, std.lv = TRUE)
+summary(mfitmoda2, fit.measures = TRUE)
+```
+
+As medidas de ajuste permanecem adequadas, exceto com relação às raizes quadradas médias de aproximação e residual, que passaram por pouco do limite aceitável
+Os critérios bayesiano e de Akaike receberam outra melhora modesta.
+
+
+
+O próximo modelo exclui o coeficiente de regressão de "Realce do status" como causa da "Atitude" (p-valor = 0,716).
+
+Especificação do modelo
+```{r}
+mee_moda3 <- 'conhecimento =~ Q6 + Q7 + Q8
+confianca =~ Q9 + Q10 + Q11
+apoio.ambiental.animal =~ Q12 + Q13 + Q14 + Q15
+apoio.social =~ Q16 + Q17 + Q18
+status =~ Q20 + Q21 + Q22
+sacrificio =~ Q23 + Q24 + Q25
+eficacia =~ Q26 + Q27 + Q28
+preço =~ Q29 + Q30 + Q31
+resistencia =~ Q32 + Q33 + Q34
+atitude =~ Q35 + Q36 + Q37 + Q38
+intençao.compra =~ Q39 + Q40 + Q41
+atitude ~ conhecimento + confianca + apoio.social + preço + sacrificio + eficacia + resistencia
+intençao.compra ~ atitude + GENERO + IDADE + RENDA'
+```
+
+
+Estimação do modelo
+```{r}
+mfitmoda3 <- sem(mee_moda3, data = dados_moda, std.lv = TRUE)
+summary(mfitmoda3, fit.measures = TRUE)
+```
+
+As medidas da qualidade do ajuste permanecem sem alterações consideráveis em relação ao ajuste anterior.
+Os critérios bayesiano e de Akaike mantém a mesma redução modesta.
+
+
+
+
+O próximo modelo exclui o coeficiente de regressão de "Gênero" como causa da "Intenção de compra" (p-valor = 0,175).
+
+Especificação do modelo
+```{r}
+mee_moda4 <- 'conhecimento =~ Q6 + Q7 + Q8
+confianca =~ Q9 + Q10 + Q11
+apoio.ambiental.animal =~ Q12 + Q13 + Q14 + Q15
+apoio.social =~ Q16 + Q17 + Q18
+status =~ Q20 + Q21 + Q22
+sacrificio =~ Q23 + Q24 + Q25
+eficacia =~ Q26 + Q27 + Q28
+preço =~ Q29 + Q30 + Q31
+resistencia =~ Q32 + Q33 + Q34
+atitude =~ Q35 + Q36 + Q37 + Q38
+intençao.compra =~ Q39 + Q40 + Q41
+atitude ~ conhecimento + confianca + apoio.social + preço + sacrificio + eficacia + resistencia
+intençao.compra ~ atitude + IDADE + RENDA'
+```
+
+
+Estimação do modelo
+```{r}
+mfitmoda4 <- sem(mee_moda4, data = dados_moda, std.lv = TRUE)
+summary(mfitmoda4, fit.measures = TRUE)
+```
+
+
+Dentre os coeficientes de regressão, os que poderiam ser tidos como não significantes foram os correspondentes a "conhecimento de moda sustentável", "confiança no mercado de moda atual" e "Percepção de eficácia" como causas da "atitude", e "renda" como causa da "intenção de compra". Mas, como seus respectivos p-valors foram próximos de 0,05 (comumente tido como linha divisória da significância), serão mantidos nesta etapa.
+
+
+
+O próximo modelo exclui a única carga não significante do modelo: a questão 29, "Eu não estou disposto a ter um esforço extra para continuar buscando uma camiseta com preço menor", como sendo comporta pelo construto "Consciência de preço" (p-valor = 0,714).
+
+Especificação do modelo:
+```{r}
+mee_moda5 <- 'conhecimento =~ Q6 + Q7 + Q8
+confianca =~ Q9 + Q10 + Q11
+apoio.ambiental.animal =~ Q12 + Q13 + Q14 + Q15
+apoio.social =~ Q16 + Q17 + Q18
+status =~ Q20 + Q21 + Q22
+sacrificio =~ Q23 + Q24 + Q25
+eficacia =~ Q26 + Q27 + Q28
+preço =~ Q30 + Q31
+resistencia =~ Q32 + Q33 + Q34
+atitude =~ Q35 + Q36 + Q37 + Q38
+intençao.compra =~ Q39 + Q40 + Q41
+atitude ~ conhecimento + confianca + apoio.social + preço + sacrificio + eficacia + resistencia
+intençao.compra ~ atitude + IDADE + RENDA'
+```
+
+
+Estimação do modelo:
+```{r}
+mfitmoda5 <- sem(mee_moda5, data = dados_moda, std.lv = TRUE)
+summary(mfitmoda5, fit.measures = TRUE)
+```
+
+Neste ajuste, os critérios de Akaike e bayesiano demonstraram melhora em dimensões maiores se comparadas às dos ajustes anteriores (redução de 3,09% e 3,07% dos critérios, respectivamente).
+Todos os parâmetros apresentaram significância compatível com os preceitos inicialmente estipulados.
+
+Verificação de associações não determinadas no modelo:
+```{r}
+View(as.data.frame(summary(mfitmoda5, modindices = TRUE)))
+```
+
+Os parâmetros que poderiam ser adicionados e não criariam recursividade, redundância ou variáveis complexas: questão 29, Gênero e Escolaridade, e os constructos "Apoio a causas ambientais e animais" e "Status", não são adições sugeridas.
+
+É sugerido que o responsável pelos dados ou quem lidará com os resultados do modelo ajustado avalie a possibilidade de torná-lo mais restrito, mantendo apenas os parâmetros mais significantes (conforme o comumente recomendado marco de p-valor igual ou menor que 0,05).
+
+Diagrama de caminhos
+```{r}
+semPaths(mfitmoda5)
+```
+
+Em comparação ao modelo proposto inicialmente, apenas algumas exclusões foram feitas e nenhuma das variáveis foi reincluída. 
+"Atitude" não é mais causada por "apoio a causas ambientes e animais" nem "status". Não há variável latente que componha a questão 29: "Eu não estou disposto a ter um esforço extra para continuar buscando uma camiseta com preço menor", mostrando-se desconexa do construto "consciência de preço". "Intenção de compra" ainda é causada por "atitude", "idade"" e "renda"", mas as variáveis "gênero" e "escolaridade" não foram relevantes.
+
+Quanto maiores o conhecimento de moda sustentável, o apoio a causas sociais, consciência de preço, percepção de eficácia e resistência à mudança, e menores a confiança no mercado de moda atual e sacrifício pessoal, maior o nível de atitude do respondente. Quanto maiores a atitude, a idade e a renda do respondente, maior será a intenção de compra.
+
+Como "resistência à mudança" foi determinante para a "atitude", supõe-se que os respondentes já tenham a atitude esperada e a resistência medida seria a resistência a mudá-la.
+
+As questões referentes a "sacrifício pessoal" são inversas ao que significa. Na prática, esse fator mede a falta de sacrifício pessoal. Quanto menor, maior o sacrifício pessoal.
+
+

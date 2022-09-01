@@ -1,0 +1,70 @@
+P-value (Chi-square)
+	p-valor
+
+Índice de comparação de ajuste (CFI)
+	0,8 ou mais
+
+Índice de Tucker Lewis (TLI)
+	0,8 ou mais
+
+Raiz do Erro Quadrático Médio de Aproximação
+	0,05 ou menos
+
+Raiz quadrada média residual
+	0,08 ou menos
+
+  Akaike (AIC)
+ajuste 0: 23188.188
+ajuste 1: 23186.201
+ajuste 2: 23184.262
+ajuste 3: 23182.398
+ajuste 4: 23182.150
+ajuste 5: 22464.787 (-3,09%)
+ajuste 6: 22361.569
+ajuste 7: 22308.117
+ajuste 8: 22307.250
+ajuste 9: 22305.486
+ajuste 10: 22305.556
+ajuste 11: 22275.713
+ajuste 12: 22246.558
+ajuste 13: 22245.207
+ajuste 14: 
+ajuste 15: 
+ajuste 16: 
+ajuste 17: 
+ajuste 18: 
+ajuste 19: 
+ajuste 20: 
+
+Bayesian (BIC)
+ajuste 0: 23615.470
+ajuste 1: 23609.922
+ajuste 2: 23604.422
+ajuste 3: 23598.998
+ajuste 4: 23595.189
+ajuste 5: 22870.705 (-3,07%)
+ajuste 6: 22771.047
+ajuste 7: 22721.156
+ajuste 8: 22716.729
+ajuste 9: 22711.403
+ajuste 10: 22707.913
+ajuste 11: 22681.631
+ajuste 12: 22656.036
+ajuste 13: 22651.125
+ajuste 14: 
+ajuste 15: 
+ajuste 16: 
+ajuste 17: 
+ajuste 18: 
+ajuste 19: 
+ajuste 20: 
+
+
+ajuste : 
+
+
+
+```{r}
+View(as.data.frame(summary(mfitmoda?, modindices = TRUE)))
+```
+

@@ -1,0 +1,1 @@
+O modelo de regressão trata apenas de valores dados por uma amostra que assume-se como representante da população da qual foi extraída; sendo assim, embora o modelo aceite qualquer entrada de dados que apresente as mesmas variáveis, a equação não pode ser considerada um preditor de uma população diferente.

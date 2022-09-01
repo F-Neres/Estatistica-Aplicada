@@ -1,0 +1,329 @@
+---
+title: "AnÃfÂ¡lise Discriminante MÃfÂºltipla"
+author: "Felipe N. S. Bezerra"
+date: "10 de dezembro de 2018"
+output:
+  word_document:
+    toc: yes
+  pdf_document:
+    number_sections: yes
+    toc: yes
+  html_document:
+    df_print: paged
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+chooseCRANmirror(graphics=FALSE, ind=1)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Avaliação - Estatística Multivariada IV
+Análise Discriminante Múltipla
+
+Considere o conjunto Auto data do pacote ISLR do software R para desenvolver um modelo de predição para prever se um carro tem alta ou baixa quilometragem.
+
+```{r}
+library(ISLR)
+library(foreign)
+library(MASS)
+library(dplyr)
+library(biotools)
+library(DiscriMiner)
+library(ggplot2)
+library(mvnormtest)
+```
+
+```{r}
+summary(Auto)
+```
+
+	(a) Crie uma variável binária, classmpg, que seja igual a 1 se o mpg for maior do que a mediana e 0, caso contrário. Você pode calcular a mediana de mpg no R usando a função median(). Note que talvez seja mais fácil usar o comando data.frame() para criar um conjunto de dados que contenha o classmpg e as demais variáveis do Auto data.
+	
+
+```{r}
+avaldata <- Auto[,-1]
+avaldata <- avaldata[,-8]
+avaldata$origin <- as.factor(avaldata$origin)
+
+scaleavaldata <- avaldata[,-7]
+scaleavaldata <- as.data.frame(scale(scaleavaldata))
+
+classmpg <- as.numeric(Auto$mpg>median(Auto$mpg))
+avaldata$classmpg <- as.factor(classmpg)
+scaleavaldata$origin <- avaldata$origin
+scaleavaldata$classmpg <- avaldata$classmpg
+```	
+
+
+________________________________________________________________________
+
+	(b) Explore os dados graficamente para investigar a associação entre o classmpg e as demais variáveis. Quais variáveis parecem ser úteis para prever o classmpg? Pode usar boxplots para responder a essa questão.
+	
+	
+```{r}
+boxplot(avaldata$cylinders ~ avaldata$classmpg, main='Cilindros')
+boxplot(avaldata$displacement ~ avaldata$classmpg, main='Deslocamento do Motor')
+boxplot(avaldata$horsepower ~ avaldata$classmpg, main='Potência')
+boxplot(avaldata$weight ~ avaldata$classmpg, main='Peso')
+boxplot(avaldata$acceleration ~ avaldata$classmpg, main='Aceleração')
+boxplot(avaldata$year ~ avaldata$classmpg, main='Ano')
+
+aggregate(avaldata[,1:6], list(avaldata$classmpg), quantile)
+```
+
+As variáveis "Cilindros" e "Deslocamento do Motor" parecem possuir maior assertividade em definir os veículos com maior consumo de combustível (classmpg = 0). Veículos com um número de cilindros diferente de 4 e Deslocamento do Motor com mais de 200 in percorrem menos milhas por galão; as demais faixas  destas variáveis apresentam consumo de combustível variado. Veículos com maior potência, menor aceleração, mais pesados e mais antigos aparentam consumir mais combustível, mas essas tendência não se mostra tão definida quanto nas duas variáveis citadas anteriormente.
+
+_______________________________________________________________________________________________
+
+	(c) Divida os dados em duas amostras, uma de treino (75%) e outra de teste (25%).
+
+```{r}
+set.seed(8)
+treinoaval <- scaleavaldata[sample(nrow(scaleavaldata),  size = nrow(scaleavaldata) * 0.75),]
+testeaval <- scaleavaldata[-sample(nrow(scaleavaldata),  size = nrow(scaleavaldata) * 0.75),]
+```
+
+_______________________________________________________________________________________________
+
+
+	(d) Obtenha e interprete as funções discriminantes para esse estudo. Verifique também as suposições da análise. Você utilizaria a análise discriminante linear ou quadrática para classificação?
+
+Verificação do tamanho da amostra:
+```{r}
+table(scaleavaldata$classmpg)
+table(treinoaval$classmpg)
+table(testeaval$classmpg)
+```
+Todos os grupos possuem mais de 20 observações (número aceitável para 6 variáveis independentes), inclusive nas amostras separadas para treino e teste.
+
+
+Verificação de multicolinearidade:
+```{r}
+cor(scaleavaldata[,1:6])
+```
+As variáveis "Cilindros" e "Deslocamento do Motor" estão altamente correlacionadas (correlação superior a 0,95). Utilizar ambas implica em redundância, então apenas uma (Deslocamento do Motor) será utilizada no ajuste do modelo.
+
+
+Normalidade multivariada das variáveis independentes:
+```{r}
+mshapiro.test(t(scaleavaldata[,1:6]))
+
+shapiro.test(scaleavaldata$cylinders)
+shapiro.test(scaleavaldata$displacement)
+shapiro.test(scaleavaldata$horsepower)
+shapiro.test(scaleavaldata$weight)
+shapiro.test(scaleavaldata$acceleration)
+shapiro.test(scaleavaldata$year)
+```
+Segundo o teste de Shapiro-Wilk, nenhuma das variáveis independentes segue distribuição normal e, consequentemente, a amostra não obedece ao pressuposto de normalidade multivariada, requerido para que se prossiga com a análise discriminante.
+
+
+Homogeneidade de variância/covariância:
+```{r}
+boxM(data = scaleavaldata[,1:6], grouping = scaleavaldata$classmpg)
+```
+Não há igualdade entre as matrizes de variâncias e covariâncias da amostra, mesmo considerando aceitável um p-valor de 0,01 (mais comum para este teste).
+
+
+
+Seleção de variável:
+```{r}
+discPower(variables = treinoaval[,1:6], group = treinoaval$classmpg)
+```
+             correl_ratio wilks_lambda F_statistic      p_value
+cylinders       0.5610599    0.4389401   373.23890 0.000000e+00 ***
+displacement    0.5495676    0.4504324   356.26593 0.000000e+00 ***
+horsepower      0.4354455    0.5645545   225.22203 0.000000e+00 ***
+weight          0.5725786    0.4274214   391.16648 0.000000e+00 ***
+acceleration    0.1017403    0.8982597    33.07302 2.236779e-08 ***
+year            0.1996819    0.8003181    72.85494 7.771561e-16 ***
+
+Todas as variáveis contribuem significativamente para a discriminação dos grupos (embora com menor relevância se tratando da "Aceleração" e do "Ano do Modelo").
+
+
+
+Determinação da função discriminante:
+```{r}
+discrim_aval <- desDA(variables = treinoaval[, c("displacement", "horsepower", "weight", "acceleration", "year")], 
+                   group = treinoaval$classmpg)
+```
+
+
+Coeficientes das funções discriminantes:
+```{r}
+discrim_aval$discrivar
+```
+Como há apenas dois grupos, só é necessária uma função discriminante.
+
+$DF= -0,005 -0,607*displacement +0,467*horsepower -1,263*weight +0,033*acceleration +0,478*year$
+
+
+
+Autovalores das funções discriminantes e variabilidade explicada:
+```{r}
+discrim_aval$values
+```
+Como só há uma função discriminante, toda a variância do modelo é explicada por ela.
+
+
+
+
+Matriz de fatores (correlação entre as variáveis explicativas e a função discriminante):
+```{r}
+discrim_aval$discor
+```
+A função discriminante obtida é mais fortemente ponderada pelo "Peso do Veídulo" e pelo "Deslocamento do motor", e menos pela "Aceleração" e pelo "Ano do Modelo".
+
+
+Significância da função discriminante
+```{r}
+summary(aov(discrim_aval$scores ~ treinoaval$classmpg), test="Wilks")
+```
+Dado o baixo p-valor, a função é considerada significante.
+
+
+Centróide:
+```{r}
+treinoaval$DF1 <- discrim_aval$scores
+treinoaval %>% group_by(classmpg) %>% summarise(C = mean(DF1))
+```
+# A tibble: 2 x 2
+  classmpg     C
+  <fct>    <dbl>
+1 0        -1.31
+2 1         1.29
+
+A função discriminante é desenvolvida de modo a tornar os valores do grupo dos veículos com maior consumo de combustível (classmpg = 0) negativos e do grupo dos veículos com menor consumo (classmpg = 1) positivos; isso fica explícito pelos valores discriminantes dos centróides de cada grupo
+
+Scatterplot
+```{r}
+treinoaval$random <- rnorm(294,mean=0,sd=10)
+
+library(ggplot2)
+ggplot(data = treinoaval, aes(x = DF1, y = random, colour = classmpg)) +
+  geom_hline(yintercept = 0, colour="gray70") +
+  geom_vline(xintercept = 0, colour="gray70") +
+  geom_point()
+```
+
+A variável na ordenada é composta de números aleatórios, apenas para que seja mais claro visualizar a distribuição das observações ao longo do eixo dos valores discriminantes.
+
+Como as matrizes de variâncias e covariâncias foram diferentes, é preferível que se utilize a análise discriminante quadrática, que, ao contrário da linear, não tem a igualdade das variâncias como um pressuposto.
+
+_______________________________________________________________________________________________
+
+	(e) Compare a LDA e a QDA com relação à taxa de erro. 
+
+Análise Discriminante Linear
+
+```{r}
+fitlda <- linDA(variables = treinoaval[, c("displacement", "horsepower", "weight", "acceleration", "year")], 
+             group = treinoaval$classmpg)
+
+classiflda <- classify(fitlda, newdata = testeaval[, c("displacement", "horsepower", "weight", "acceleration", "year")])$pred_class
+tablda <- table(classiflda, testeaval$classmpg)
+tablda
+acurlda <- (tablda[1,1] + tablda[2,2])/sum(tablda)
+acurlda
+```
+
+Análise Discriminante Quadrática
+
+```{r}
+fitqda <- quaDA(variables = treinoaval[, c("displacement", "horsepower", "weight", "acceleration", "year")], 
+             group = treinoaval$classmpg)
+
+classidqda <- classify(fitqda, newdata = testeaval[, c("displacement", "horsepower", "weight", "acceleration", "year")])$pred_class
+tabqda <- table(classidqda, testeaval$classmpg)
+tabqda
+acurqda <- (tabqda[1,1] + tabqda[2,2])/sum(tabqda)
+acurqda
+```
+
+Embora ambas as formas de análise, linear e quadrática, obtiveram a mesma taxa de acerto, a análise linear classificou mais veículos (e, com isso, teve tanto mais acertos quanto mais erros) como pertencentes ao grupo 1, dos veículos com menor consumo de combustivel por distância percorrida.
+
+_______________________________________________________________________________________________
+
+
+	(f) Faça uma regressão logística e avalie sua taxa de erro de acordo com alguma regra de classificação.
+
+
+```{r}
+treinoaval$classmpg <- as.numeric(treinoaval$classmpg) -1
+testeaval$classmpg <- as.numeric(testeaval$classmpg) -1
+
+fitlgr <- glm(classmpg ~ cylinders + displacement + horsepower + weight + acceleration + year, 
+                      family = binomial(link = 'logit'), data = treinoaval)
+fitlgr
+
+p <- mean(treinoaval$classmpg)
+p
+
+log_chances <- predict.glm(fitlgr, newdata = testeaval[,1:6])
+prob_posteriori <- exp(log_chances)/(1+exp(log_chances))
+prob_posteriori
+classiflgr <- ifelse(prob_posteriori > p, 1, 0) 
+classiflgr
+tablgr <- table(classiflgr, testeaval$classmpg)
+tablgr
+acurlrg <- (tablgr[1,1] + tablgr[2,2])/sum(tablgr)
+acurlrg
+
+treinoaval$classmpg <- as.factor(treinoaval$classmpg)
+testeaval$classmpg <- as.factor(testeaval$classmpg)
+```
+
+A regra de classificação considerou a própria probabilidade *a priori* de um veículo pertencer a determinado grupo. Veículos que tiveram uma probabilidade de pertencer ao grupo 1, segundo a regressão logística, maior que a proporção de veículos do grupo 1, foram classificados em tal grupo.
+
+A taxa de acerto, neste caso, foi maior que o obtido da análise discriminante.
+
+_______________________________________________________________________________________________
+
+
+	(g) Faça agora uma árvore de decisão e avalie sua taxa de erro.
+
+
+```{r}
+set.seed(0)
+library(rpart)
+
+fitdtr <- rpart(classmpg ~ cylinders + displacement + horsepower + weight + acceleration + year + origin,
+             method="class", data = treinoaval)
+fitdtr
+
+melhorCp = fitdtr$cptable[which.min(fitdtr$cptable[,"xerror"]),"CP"]
+melhorCp
+
+pfit <- prune(fitdtr, cp = melhorCp)
+pfit
+
+plot(pfit)
+text(pfit,use.n=FALSE,all=FALSE,cex=1.5)
+
+classifdtr <- predict(pfit, testeaval[,1:7], type = 'class')
+tabdtr <- table(classifdtr, testeaval$classmpg)
+tabdtr
+acurdtr <- (tabdtr[1,1] + tabdtr[2,2])/sum(tabdtr)
+acurdtr
+```
+
+Este método de classificação obteve a maior taxa de acerto, embora não tão distante dos demais métodos.
+
+_______________________________________________________________________________________________
+
+
+	(h) Utilize o método dos vizinhos mais próximos com k = 30 e avalie sua taxa de erro.
+
+
+```{r}
+library(class)
+fitknn = knn(train = treinoaval[,1:7], test = testeaval[,1:7], 
+             cl = treinoaval$classmpg, k = 30)
+tabknn <- table(fitknn, testeaval$classmpg)
+tabknn
+acurknn <- (tabknn[1,1] + tabknn[2,2])/sum(tabknn)
+acurknn
+```
+
+o método de "k vizinhos mais próximos" obteve exatamente a mesma taxa de acerto das análises discriminantes linear e quadrática. Entretanto, tendendo a classificar mais observações como pertencentes à classe 1, mas não tanto quanto a LDA.

@@ -1,0 +1,138 @@
+---
+title: "Exercício 7"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Carregar os dados de "dados_alunos"
+
+É preciso remover a coluna "Candidatos"
+
+```{r}
+dados.alunos <- dados_alunos[,-1]
+View(dados.alunos)
+```
+
+Renomear as colunas, para evitar unicode
+
+```{r}
+colnames(dados.alunos)[2] <- "nota"
+colnames(dados.alunos)[3] <- "hist"
+
+dados.alunos$Grupo <- as.factor(dados.alunos$Grupo)
+
+View(dados.alunos)
+```
+
+escalonamento dos dados
+
+```{r}
+dados.alunos[,-1] <- scale(dados.alunos[,-1])
+```
+
+```{r}
+summary(dados.alunos)
+
+```
+
+
+_________________________________________________________________________________________________________________
+
+(A) Qual variável parece diferenciar mais grupo analisando as médias?
+
+```{r}
+aggregate(dados.alunos[,2:3], list(dados.alunos$Grupo),mean)
+```
+  Group.1       nota       hist
+1       1  1.0317578  1.0665079
+2       2  0.3717167  0.2458001
+3       3 -0.9707743 -0.9265615
+
+Nenhuma.
+
+
+```{r}
+aggregate(dados.alunos[,2:3], list(dados.alunos$Grupo), sd)
+```
+  Group.1      nota      hist
+1       1 0.2259496 0.4448766
+2       2 0.1644569 0.3899371
+3       3 0.6457966 0.5641847
+
+_________________________________________________________________________________________________________________
+
+(B) Obtenha e interprete as funções discriminantes.
+
+  *Ajuste das funções discriminantes*
+
+Modelo discriminante linear
+```{r}
+discrim_aluno <- desDA(variables = dados.alunos[, c("nota", "hist")], 
+                   group = dados.alunos$Grupo)
+discrim_aluno
+```
+
+_________________________________________________________________________________________________________________
+
+(C) Qual percentual de variância é explicada pelas funções discriminantes?
+Proporção da variância explicada
+$values >> Proportion
+
+_________________________________________________________________________________________________________________
+
+(D) Avalie a significância das funções discriminantes.
+Utiliza-se o Lâmbida de Wilks
+
+```{r}
+summary(manova(discrim_aluno$scores ~ dados.alunos$Grupo), test="Wilks")
+```
+Dado o baixo p-valor, as funções são consideradas significantes.
+
+_________________________________________________________________________________________________________________
+
+(E) Construa e analise o gráfico scatterplot com as funções discriminantes.
+
+
+Centróides
+```{r}
+dados.alunos$DF1 <- discrim_aluno$scores[,1]
+dados.alunos$DF2 <- discrim_aluno$scores[,2]
+dados.alunos %>% group_by(Grupo) %>% summarise(C1 = mean(DF1), C2 = mean(DF2))
+```
+
+```{r}
+library(ggplot2)
+ggplot(data = dados.alunos, aes(x = DF1, y = DF2, colour = Grupo)) +
+  geom_hline(yintercept = 0, colour="gray70") +
+  geom_vline(xintercept = 0, colour="gray70") +
+  geom_point()
+```
+
+_________________________________________________________________________________________________________________
+
+(F) De acordo com as funções de classificação, onde você classificaria um aluno que apresentasse nota técnica igual a 15 e nota 8 no histórico escolar?
+
+Criar ajustes lineares e quadráticos com Cross-Validation e Data-Split
+
+
+
+Como os dados foram escalonados, é preciso obter a média e o desfio-padrão das variáveis antes do escalonamento. Os dados a serem inseridos são subtraídos das respectivas médias e divididos pelo desvio-padrão 
+```{r}
+classify(discrim_aluno, newdata = data.frame(nota = 2.91, hist = 0.4779412))
+```
+
+(G) Por meio da matriz de classificação, qual a acertividade da análise?
+
+
+
+(H) Avalie a assertividade por CV e data splitting (comparar quadrático e linear).
+
+
+
+
+
+
+Ao rejeitar o teste de que as variâncias são iguais, utiliza-se a discriminação quadrática

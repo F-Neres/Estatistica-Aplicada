@@ -1,0 +1,106 @@
+---
+title: "Avaliação sobre ACP - Exercício 5"
+author: "Felipe N. S. Bezerra"
+date: "24 de março de 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+5) Em raw-material-characterization.csv, encontram-se 6 mensurações de características de lotes de pastilhas de plástico e ainda o resultado de avaliação do uso do material (fraco ou adequado). Algumas variáveis estão codificadas para confidencialidade.
+. Número do lote (Lot number);
+. Resultado da avaliação (Outcome);
+. Percentuais de materiais 1, 2 e 3 num determinado intervalo de tamanho (Size5, Size10, Size15);
+. Medida termogravimétrica (TGA);
+. Medida termomecânica (TMA);
+. Medida de calorimetria (DSC).
+
+
+```{r}
+dados.rmc <- read.csv("D:/Documentos/Estatística/Aulas/2019-04-28 Análise de Componentes Principais/ACP2 - Alunos/raw-material-characterization.csv", header=TRUE, sep=";")
+dados.rmc[,3:8] <- na.omit(dados.rmc[,3:8])
+```
+
+```{r}
+library(foreign)
+library(psych)
+library(stats)
+library(dplyr)
+library(corrplot)
+library(mvnormtest)
+library(GPArotation)
+```
+
+a) Faça uma Análise de Componentes Principais para resumir as informações contidas nas variáveis, exceto Outcome. Interprete os resultados.
+
+Teste de esferacidade de Bartllet:
+```{r}
+bartlett.test(dados.rmc[,3:8])
+```
+
+Conforme o resultado significante do teste de esfericidade, há correlação entre as variáveis, que justifica o uso da análise de componentes principais.
+
+
+Escolha do número de fatores
+```{r}
+ajuste1 <- princomp(dados.rmc[,3:8], cor=TRUE)
+summary(ajuste1)
+plot(ajuste1, type="lines")
+```
+Segundo critério de Kaiser: 2 componentes.
+Segundo a variância acumulada: 2 componentes.
+segundo screeplot: 5 componentes.
+
+Serão mantidos 2 componentes.
+
+
+Ajuste do modelo com número de componentes definido
+```{r}
+ajuste2 <- principal(dados.rmc[,3:8], covar = FALSE, nfactors = 2)
+ajuste2
+```
+
+RC1: correlacionado positivamente com os percentuais de materiais de cada intervalo de tamanho.
+RC2: correlacionado positivamente com as medidas termogravimétrica e termomecânica, e negativamente com a medida de calorimetria.
+
+ 
+b) Compare descritivamente as pastilhas fracas e adequadas quanto às componentes encontradas.
+
+```{r}
+dados.rmc$comp1 <- ajuste2$scores[,1]#RC1 é o componente 1
+dados.rmc$comp2 <- ajuste2$scores[,2]#RC2 é o componente 2
+
+tabela <- dados.rmc%>%
+  group_by(Outcome) %>%
+  summarise(media_c1 = mean(comp1, na.rm = TRUE),
+            media_c2 = mean(comp2, na.rm = TRUE))
+
+tabela
+```
+# A tibble: 2 x 3
+  Outcome  media_c1 media_c2
+1 Adequate   -0.420    0.258
+2 Poor        1.02    -0.627
+
+Supõe-se que pastilhas adequadas terão menores percentuais de materiais em cada intervalo de tamanho (componente 1), maiores resultados das medidas termogravimétrica e termomecânica e menores de calorimetria (componente 2).
+
+
+c) Faça um modelo de regressão logística para verificar a significância das componentes na chance de uma pastilha ser adequada.
+
+```{r}
+modelo.logit<- glm(Outcome=='Adequate' ~ comp1+comp2, data = dados.rmc,family=binomial(link="logit"))
+summary(modelo.logit)
+exp(modelo.logit$coefficients)
+```
+
+O intercepto e o coeficiente para o componente 2 demonstraram significância marginal. Já o coeficiente para o componente 1 foi de fato significante.
+
+Log.chance de dados.rmc = -3.341xcomp1
+
+
+
+d) Quais seriam suas recomendações para se obter mais lotes considerados adequados do que fracos?
+
+Quanto maior o valor para o componente 1, que é o componente mais determinante para o resultado da avaliação, menores as chances do resultado ser adequado. Como o componente 1 está altamente correlacionado com os percentuais de materiais 1, 2 e 3 em cada intervalo de tamanho, reduzir as proporções desses materiais nas pastilhas de pásticos pode aumentar as chances de obter pastilhas adequadas.

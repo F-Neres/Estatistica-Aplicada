@@ -1,0 +1,143 @@
+			Fatores
+
+	PA1
+Folk - Gosto de Folk music
+Classical - Gosto de música clássica
+Musical - Gosto de Musicais
+Swing..Jazz - Gosto de Swing, Jazz
+Opera - Gosto de Opera
+Psychology - Tenho interesse em Psychology
+Reading - Tenho interesse em Poetry reading
+Art.exhibitions - Tenho interesse em Art
+Musical.instruments - Tenho interesse em Playing musical instruments
+Writing - Tenho interesse em Poetry writing
+Theatre - Tenho interesse em Theatre
+Charity - Eu sempre dou caridade.
+
+	PA2
+Sci.fi - Gosto de Sci-fi movies
+Western - Gosto de Western movies
+Action - Gosto de Action movies
+Mathematics - Tenho interesse em Mathematics
+Physics - Tenho interesse em Physics
+Internet - Tenho interesse em Internet
+PC - Tenho interesse em PC Software
+Cars - Tenho interesse em Cars
+Science.and.technology - Tenho interesse em Science and technology
+Spending.on.gadgets - Eu gasto muito dinheiro em aparelhos
+
+
+	PA11
+Celebrities - Tenho interesse em Celebrity lifestyle
+Shopping - Tenho interesse em Shopping
+Health - Eu me preocupo com minha saúde.
+Appearence.and.gestures - Eu cuido da minha aparência.
+Knowing.the.right.people - Eu sempre me certifico de me conectar com as pessoas certas.
+Shopping.centres - Eu gosto de ir a grandes shopping centers.
+Branded.clothing - Eu prefiro roupas de marcas a roupas sem marcas.
+Spending.on.looks - Eu gasto muito dinheiro com minha aparência.
+
+	PA5
+Self.criticism - Muitas vezes penso e me arrependo das decisões que tomo.
+Loneliness - Eu me sinto sozinho na vida.
+Changing.the.past - Eu gostaria de poder mudar o passado por causa das coisas que fiz.
+(-)Dreams - (N) Eu sempre tenho sonhos bons.
+Mood.swings - Meu humor pode mudar rapidamente.
+Getting.angry - Eu posso ficar nervoso facilmente.
+(-)Happiness.in.life - (N) Eu estou 100% feliz com a minha vida.
+(-)Personality - (N) Eu acredito que todos os meus traços de personalidade são positivos.
+
+	PA14
+(-)Fear.of.public.speaking - (N) Tenho medo de falar em público
+(-)Decision.making - (N) Eu aproveito meu tempo para tomar decisões
+Number.of.friends - Eu tenho muitos amigos.
+New.environment - Eu posso me adaptar rapidamente a um novo ambiente.
+Socializing - Eu gosto de conhecer pessoas.
+(-)Public.speaking - (N) Eu tenho de estar bem preparado para falar em público.
+Energy.levels - Eu estou sempre cheio de vida e energia.
+Interests.or.hobbies - Eu tenho diferentes hobbies e interesses.
+
+	PA7
+Biology - Tenho interesse em Biology
+Chemistry - Tenho interesse em Chemistry
+Medicine - Tenho interesse em Medicine
+
+	PA8
+Rock - Gosto de Rock
+Metal.or.Hardrock - Gosto de Metal Rock ou Hardrock
+Punk - Gosto de Punk
+Rock.n.roll - Gosto de Rock n Roll
+Alternative - Gosto de Alternative music
+
+	PA4
+Healthy.eating - Eu tenho um estilo de vida muito saudável.
+Prioritising.workload - Eu tento fazer minhas tarefas o mais rápido possível e não as deixo até o último minuto.
+Writing.notes - Eu sempre faço listas e por isso eu não esqueço nada.
+Workaholism - Eu frequentemente estudo ou trabalho mesmo no meu tempo livre.
+(-)Cheating.in.school - (N) Eu costumava faltar na escola.
+(-)Getting.up - (N) Eu acho muito difícil acordar cedo.
+Finances - Eu guardo todo o dinheiro que posso.
+
+	PA6
+History - Tenho interesse em History
+Politics - Tenho interesse em Politics
+Geography - Tenho interesse em Geography
+Daily.events - Eu presto atenção ao que acontece a minha volta
+
+	PA16
+Dance - Gosto de Dance, Disco e Funk
+Pop - Gosto de Pop
+Latino - Gosto de música latina
+
+	PA9
+Religion - Tenho interesse em Religion
+Final.judgement - Eu acredito que pessoas más sofrerão um dia e pessoas boas serão recompensadas.
+God - Eu acredito em Deus
+
+	PA3
+Fun.with.friends - Tenho interesse em Socializing
+Entertainment.spending - Eu gasto muito dinheiro em festas e socializando.
+
+	PA18
+Comedy - Gosto de Comedies
+Romantic - Gosto de Romantic movies
+Fantasy.Fairy.tales - Gosto de Tales
+Empathy - Eu sou uma pessoa empática
+Life.struggles - Eu choro quando me sinto chateado ou quando as coisas não acontecem do jeito certo.
+
+	PA15
+Dancing - Tenho interesse em Dancing
+Active.sport - Tenho interesse em Sport at competitive level
+Adrenaline.sports - Tenho interesse em Adrenaline sports
+
+	PA19
+Reliability - Eu sou confiável no trabalho e sempre completo todas as tarefas que me são dadas.
+Keeping.promises - Eu sempre cumpro minhas promessas.
+Borrowed.stuff - Eu cuido das coisas que pego emprestado com outros.
+
+	PA12
+War - Gosto de War movies
+Documentary - Gosto de Documentaries
+
+	PA10
+Horror - Gosto de Horror movies
+Thriller - Gosto de Thriller movies
+
+	PA13
+Foreign.languages - Tenho interesse em Foreign languages
+
+	PA17
+Parents..advice - Eu sempre ouço os conselhos dos meus pais.
+
+
+	Variáveis Complexas
+Dancing - 
+Cheating.in.school - 
+Health - 
+Charity - 
+Number.of.friends - 
+Knowing.the.right.people - 
+Life.struggles - 
+Energy.levels - 
+Parents..advice - 
+Finances - 

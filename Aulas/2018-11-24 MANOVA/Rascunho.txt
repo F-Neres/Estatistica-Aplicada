@@ -1,0 +1,198 @@
+https://en.wikiversity.org/wiki/Advanced_ANOVA/MANOVA
+
+1. Por que a MANOVA (ou MANCOVA) seria um tipo de análise indicada neste caso? Explique.
+
+Busca-se explicar as diferenças de grupos segundo variáveis contínuas dependentes.
+Determinar a probabilidade de que diferenças em médias em múltiplas variáveis contínuas ao longo de diversos grupos não ocorrem apenas devido a erro amostral.
+Comporta múltiplos fatores independentes (como a ANOVA) e múltiplas variáveis resposta (como o T² de Hotteling)
+
+
+2. Interprete as análises em relação a Linearidade e Indepêndencia. O que pode ser feito se esses pressupostos não forem alcançados?
+Se as observações são independentes umas das outras é algo determinado no âmbito da coleta de dados ou de forma conceitual, de acordo com o escopo da pesquisa. As causas mais comuns de violação deste pressuposto são o tempo - quando o momento da coleta dos dados ou é diferente o bastante para causar alterações nos dados - e o espaço - quando o ambiente de algum modo influencia nos dados aferidos mas não é devidamente considerado.
+Linearidade:
+correlações aos pares de variáveis dependentes
+Teste de esfericidade de Bartlett: examina de forma coletiva se há inter-correlação entre as variáveis dependentes.
+resolver: transformação dos dados; pode-se aceitar as variáveis não lineares, em busca de maior representatividade em detrimento de assertividade.
+
+
+4. Interprete as análises em relação a presença de outliers. Qual é a sugestão em relação aos dados?
+
+Demasiadas observações tidas como outliers
+Sugere algum tipo de agrupamento não contemplado pelos tratamentos
+Buscar alguma covariável que explique a disparidade dos dados
+
+
+	Análise
+
+
+	Conserto
+Linearidade	Transformações
+Independência	analisar os escores médias dos grupos em vez dos escores individuais das observações
+		fator de blocagem/covariável que explique a dependência
+		nível menor de significância
+
+3. Interprete as análises em relação a normalidade e homocedasticidade.
+Seja observando a amostra separada pelo tempo ou de forma conjunta, rejeita-se a hipótese de que todas as variáveis são normais multivariadas (ou seja, de que o efeito conjunto das variáveis dependentes é distribuído normalmente). Violações desta suposição criam problemas na aplicação do teste M de Box, mas têm pouco impacto sobre amostras maiores. Considerando as amostras do Tempo 1 e do Tempo 2 separadamente, é possível afirmar, segundo os resultados dos testes M de Box, que a matrizes de variância-covariância das medidas dependentes para cada grupo são iguais.
+
+
+
+
+
+
+
+
+10.	Descreva algumas situações de análise de dados nas quais MANOVA e MANCOVA seriam adequadas em suas áreas de interesse.
+	Descreva os tipos de variáveis ou covariáveis e como elas poderiam estar operando na análise como variáveis e covariáveis?
+
+As pesquisas da área econômica que mais facilmente pode-se encontrar variáveis categóricas, que formem grupos que podem ser comparados através de medidas quantitativas são as que possuem finalidade de avaliação de opinião ou com intuito socioeconômico.
+Tomando como exemplo uma pesquisa socioeconômica, as variáveis independentes podem separar os respondentes em divisões geográficas dentro de um território (regiões, estados ou municípios dentro de um país, de uma região ou de um estado).
+As variáveis dependentes poderiam ser fundamentadas nos conceitos de desenvolvimento humano, tais como renda familiar, escolaridade (dada em anos de estudo), horas semanais disponíveis para o lazer e nível de segurança, saneamento e sistema de saúde (estes últimos dados em escore pelo respondente).
+Tais variáveis dependentes poderiam não ser explicadas somente pela diferenciação regional, mas por sexo e zona de residência (urbana ou rural), inseridas como fatores de blocagem, e idade incluída como covariável.
+
+
+
+O pesquisador seria capaz não somente de determinar se a variável estatística difere significativamente ao longo dos grupos, mas também avaliar quais características dos grupos se relacionam a tais diferenças.
+
+
+
+9.	Como o poder estatístico é afetado por decisões de DELINEAMENTO ESTATÍSTICO e de PESQUISA?
+	Como você planejaria um estudo para garantir um poder adequado?
+Quatro características específicas podem afetar o poder estatístico de uma MANOVA: o valor de alfa que define que os grupos são significantemente diferentes, o tamanho do efeito do tratamento, o tamanho amostral dos grupos e as correlações entre as variáveis dependentes.
+
+	Poder Estatístico
+  Utilidade:
+Tamanho amostral necessário
+Medida diagnóstica dos resultados (quando efeitos não-significantes são descobertos)
+  Impacto:
+Significância - Alfa
+Tamanho do efeito do tratamento - diferenças em médias de grupos divididas por seu desvio-padrão
+Tamanho amostral dos grupos
+  Poder adequado:
+Ser menos criterioso (nível de alfa mais abrangente, maior) aumenta o poder mas permite que resultados não-significantes sejam identificados
+Tamanho de efeito não é controlável em pesquisa de campo
+Aumento do tamanho amostral:
+*De forma genérica, aumento do tamanho amostral deixa de ser relevante ao poder estatístico quando o grupo ampliado já atingiu 150 observações
+  Planejamento e Análise
+Tamanho amostral exigido para determinado tamanho de efeito
+*a partir de pesquisa anterior
+*algum tipo de julgamento (?)
+*nível de significância prático
+Análise covariada e fator de blocagem para aumentar o tamanho do efeito
+  Multicolinearidade
+Cada variável dependente tem um tamanho de efeito
+Correlações formadas por pares de variáveis forte-forte ou fraca-fraca acentuam o poder do teste se altamente negativas
+Quando formadas por pares forte-fracam o poder é maximizado com altas correlações tanto positivas quanto negativas
+Mesmo quando os itens são redundantes, o acréscimo de variáveis dependentes resulta em ganho de poder.
+
+
+MANCOVA Tempo 1
+
+ Multivariate Tests                                                         
+ -------------------------------------------------------------------------- 
+                                  value      F       df1    df2    p        
+ -------------------------------------------------------------------------- 
+   trata    Pillai's Trace           2.34    43.2     18    219    < .001   
+            Wilks' Lambda         0.00118     110     18    201    < .001   
+            Hotelling's Trace        79.7     309     18    209    < .001   
+            Roy's Largest Root       74.5     906      6     73    < .001   
+ -------------------------------------------------------------------------- 
+
+
+ Univariate Tests                                                                            
+ ------------------------------------------------------------------------------------------- 
+                Dependent Variable    Sum of Squares    df    Mean Square    F      p        
+ ------------------------------------------------------------------------------------------- 
+   trata        p0                             657.5     3        219.151    247    < .001   
+                p10                           1014.8     3        338.272    395    < .001   
+                p20                           1143.1     3        381.037    860    < .001   
+                p30                            985.7     3        328.577    707    < .001   
+                p40                            580.7     3        193.576    324    < .001   
+                p50                            682.6     3        227.550    253    < .001   
+   Residuals    p0                              67.5    76          0.888                    
+                p10                             65.1    76          0.856                    
+                p20                             33.7    76          0.443                    
+                p30                             35.3    76          0.465                    
+                p40                             45.4    76          0.598                    
+                p50                             68.4    76          0.900                    
+ ------------------------------------------------------------------------------------------- 
+
+ MANCOVA Tempo 2
+
+ Multivariate Tests                                                          
+ --------------------------------------------------------------------------- 
+                                  value      F        df1    df2    p        
+ --------------------------------------------------------------------------- 
+   trata    Pillai's Trace           2.53     64.9     18    219    < .001   
+            Wilks' Lambda         4.31e-5      380     18    201    < .001   
+            Hotelling's Trace         980     3793     18    209    < .001   
+            Roy's Largest Root        971    11812      6     73    < .001   
+ --------------------------------------------------------------------------- 
+
+
+ Univariate Tests                                                                             
+ -------------------------------------------------------------------------------------------- 
+                Dependent Variable    Sum of Squares    df    Mean Square    F       p        
+ -------------------------------------------------------------------------------------------- 
+   trata        p0                            8559.0     3       2853.005    4142    < .001   
+                p10                           5936.0     3       1978.654    2758    < .001   
+                p20                           5003.6     3       1667.874    1673    < .001   
+                p30                           7032.2     3       2344.082    1559    < .001   
+                p40                           9577.2     3       3192.392    4646    < .001   
+                p50                           9653.3     3       3217.754    4043    < .001   
+   Residuals    p0                              52.4    76          0.689                     
+                p10                             54.5    76          0.717                     
+                p20                             75.8    76          0.997                     
+                p30                            114.3    76          1.504                     
+                p40                             52.2    76          0.687                     
+                p50                             60.5    76          0.796                     
+ -------------------------------------------------------------------------------------------- 
+
+
+ MANCOVA Cov
+
+ Multivariate Tests                                                       
+ ------------------------------------------------------------------------ 
+                                  value    F       df1    df2    p        
+ ------------------------------------------------------------------------ 
+   trata    Pillai's Trace        1.123    15.2     18    456    < .001   
+            Wilks' Lambda         0.212    17.2     18    425    < .001   
+            Hotelling's Trace      2.26    18.6     18    446    < .001   
+            Roy's Largest Root     1.29    32.8      6    152    < .001   
+                                                                          
+   Tempo    Pillai's Trace        0.651    46.6      6    150    < .001   
+            Wilks' Lambda         0.349    46.6      6    150    < .001   
+            Hotelling's Trace      1.86    46.6      6    150    < .001   
+            Roy's Largest Root     1.86    46.6      6    150    < .001   
+ ------------------------------------------------------------------------ 
+
+
+ Univariate Tests                                                                               
+ ---------------------------------------------------------------------------------------------- 
+                Dependent Variable    Sum of Squares    df     Mean Square    F        p        
+ ---------------------------------------------------------------------------------------------- 
+   trata        p0                              2924      3          974.8     23.6    < .001   
+                p10                             2498      3          832.7     28.2    < .001   
+                p20                             2338      3          779.4     30.8    < .001   
+                p30                             2284      3          761.2     20.1    < .001   
+                p40                             3782      3         1260.7     30.2    < .001   
+                p50                             3789      3         1262.9     29.3    < .001   
+   Tempo        p0                              8011      1         8010.8    193.6    < .001   
+                p10                             6591      1         6591.5    223.5    < .001   
+                p20                             6381      1         6380.6    252.4    < .001   
+                p30                             7262      1         7261.8    191.3    < .001   
+                p40                             9072      1         9071.7    217.2    < .001   
+                p50                             9011      1         9011.4    209.2    < .001   
+   Residuals    p0                              6412    155           41.4                      
+                p10                             4572    155           29.5                      
+                p20                             3918    155           25.3                      
+                p30                             5884    155           38.0                      
+                p40                             6473    155           41.8                      
+                p50                             6676    155           43.1                      
+ ---------------------------------------------------------------------------------------------- 
+
+
+
+
+		Interpretação
+p-valor abaixo do critério estipulado pelo pesquisados (alfa) indica que há ao menos uma diferença significante entre dois grupos. Para um exame mais sistematico sobre as diferenças entre os grupos faz-se necessário testes post hoc ou a priori.
+Para comparar a efetividade da inclusão da covariável tempo, seria necessário efetuar um teste MANOVA com todas as observações de ambos os tempos, mas sem considerar o Tempo como uma covariável. Se não há melhora significativa nos resultados com a inclusão da covariável, sua aplicação não é justificável.

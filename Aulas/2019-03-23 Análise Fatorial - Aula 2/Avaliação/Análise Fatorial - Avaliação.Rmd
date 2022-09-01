@@ -1,0 +1,187 @@
+---
+title: "Avaliação - Análise Fatorial"
+author: "Felipe N. S. Bezerra"
+date: "24 de março de 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+install.packages('foreign')
+install.packages('psych')
+install.packages('stats')
+install.packages('dplyr')
+install.packages('corrplot')
+install.packages('mvnormtest')
+install.packages('GPArotation')
+
+library(foreign)
+library(psych)
+library(stats)
+library(dplyr)
+library(corrplot)
+library(mvnormtest)
+library(GPArotation)
+```
+
+```{r}
+setwd("D:/Documentos/Estatística/Aulas/2019-03-23 Análise Fatorial - Aula 2/Avaliação")
+
+dados = read.csv('D:/Documentos/Estatística/Aulas/2019-03-23 Análise Fatorial - Aula 2/Avaliação/dados_jovens.csv', sep = ';', dec = ',')
+dados = na.omit(dados)
+glimpse(dados)
+```
+
+a)	Analisando o KMO e o teste de esfericidade, podemos descrever essa grande quantidade de interesses humanos em um número menor de conceitos latentes?
+
+```{r}
+KMO(dados) #81% da variabilidade vem de fator comum - abaixo do limite
+bartlett.test(dados) #hipotése rejeitada (p-value < 2.2e-16), as variáveis são correlacionadas
+```
+
+
+
+b)	Quantos fatores podem ser utilizados no modelo?
+
+```{r}
+fit_acp <- princomp(na.omit(dados), cor=TRUE)
+summary(fit_acp) # variâncias (autovalores)
+```
+
+
+```{r}
+plot(fit_acp,type="lines", main = 'Scree-Plot') # scree plot: 6 fatores.
+```
+
+
+c)	Estime as cargas dos fatores por Eixos Principais e escolha um método de rotação (Varimax ou Oblimin) e explique por que é mais adequado para a análise dos dados.
+
+Eixos Principais. Rotação oblimin.
+```{r}
+fit_ep_obl <- fa(dados, nfactors=24, ,rotate="oblimin", fm="pa")
+fit_ep_obl # print results
+write.table(fit_ep_obl$loadings, 'cargas_ex3_24f_epobl_aval.csv', sep = ';', dec = ',')
+```
+
+PA1 e PA22:  0,32
+PA2 e PA15:  0,30
+PA1 e PA18:  0,30
+
+Eixos principais. Rotação varimax. 24 fatores
+
+```{r}
+fit_ep_vrmx <- fa(dados, 24,rotate="varimax", fm="pa")
+fit_ep_vrmx
+fit_ep_vrmx$loadings
+write.table(fit_ep_vrmx$loadings, 'cargas_ex3_24f_aval.csv', sep = ';', dec = ',')
+```
+
+
+
+Eixos principais. Rotação varimax. 20 fatores
+
+```{r}
+fit_ep_vrmx <- fa(dados, 19,rotate="varimax", fm="pa")
+fit_ep_vrmx
+fit_ep_vrmx$loadings
+write.table(fit_ep_vrmx$loadings, 'cargas_ex3_19f_aval.csv', sep = ';', dec = ',')
+```
+
+
+
+#c) Utilizando o método de Componentes Principais, avalie qual tipo de rotação é mais indicado aos dados (oblimin ou varimax).
+fit_acp_obl <- principal(dados, nfactors=4, rotate="oblimin")
+fit_acp_obl # print results
+#With component correlations of
+#Todas as correlações estiveram entre -0.3 e +0.3. É aconselhável utilizar varimax
+fit_acp_var <- principal(na.omit(dados), nfactors=4, rotate="varimax") #Modelo varimax com componentes principais
+
+
+#d) Indique a variável mais e a menos explicada pelos fatores em estudo. 
+fit_acp_obl$communality
+#Mais explicada: fixed.acidity
+#Menos explicada: residual.sugar
+
+
+#e) Interprete os fatores obtidos.
+fit_acp_var # print results
+write.table(fit_acp_var$loadings, 'cargas_ex3_aval.csv', sep = ';', dec = ',')
+
+##RC1 explica:
+#fixed.acidity
+#citric.acid
+#density
+#pH
+
+##RC2 explica:
+#volatile.acidity
+#alcohol
+#quality
+
+##RC3 explica:
+#residual.sugar
+#free.sulfur.dioxide
+#total.sulfur.dioxide
+
+##RC4 explica:
+#chlorides
+#sulphates
+
+
+#f) Compare os resultados obtidos com as extrações por eixos principais e máxima verossimilhança.
+
+####Eixos Principais
+fit_aep_var <- fa(dados, 4,rotate="varimax", fm="pa")
+fit_aep_var # print results
+write.table(fit_aep_var$loadings, 'cargas_ex4ep.csv', sep = ';', dec = ',')
+
+##PA1 explica:
+#fixed.acidity
+#citric.acid
+#density
+#pH
+
+##PA2 explica:
+#volatile.acidity
+#alcohol
+#quality
+
+##PA3 explica:
+#residual.sugar
+#free.sulfur.dioxide
+#total.sulfur.dioxide
+
+
+##PA4 explica:
+#chlorides
+#sulphates
+
+
+####Máxima Verossimilhança
+fit_amv_var <- fa(dados, 4,rotate="varimax", fm="mle")
+fit_amv_var
+write.table(fit_amv_var$loadings, 'cargas_ex4mv.csv', sep = ';', dec = ',')
+
+##ML4 explica:
+#fixed.acidity
+#volatile.acidity
+#citric.acid
+#pH
+#sulphates
+
+##ML1
+#chlorides
+#alcohol
+#quality
+
+##ML3
+#free.sulfur.dioxide
+#total.sulfur.dioxide
+
+##ML2
+#residual.sugar
+#density

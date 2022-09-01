@@ -1,0 +1,280 @@
+---
+title: "Exercício 3 - Discriminante"
+author: "Neres Bezerra"
+date: "20 de outubro de 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+  3)Considere os dados referentes a duas raças de insetos (A e B) com variáveis independentes o número médio de cerdas promordiais (CP) e o número médio de cerdas distais (CD). Os dados se encontram na planilha dados_insetos.xlsx.
+  
+  a) Antes de iniciar a análise, quantas funções discriminantes serão obtidas?
+  b) Determine e interprete as funções discriminantes dessas duas raças pelo método de Fisher selecionando todas as variáveis para a análise.
+  c) Analise o poder de discriminação das variáveis.
+  d) Analise a significância das funções discriminantes.
+
+_________________________________________________________________________________________________________________
+
+Instale e carregue os pacotes
+
+```{r}
+install.packages("foreign")
+install.packages("MASS")
+install.packages("dplyr")
+install.packages("biotools")
+install.packages("DiscriMiner")
+install.packages("ggplot2")
+install.packages("mvnormtest")
+
+library(foreign)
+library(MASS)
+library(dplyr)
+library(biotools)
+library(DiscriMiner)
+library(ggplot2)
+library(mvnormtest)
+```
+
+_________________________________________________________________________________________________________________
+
+Carregue os dados
+
+*Import Dataset \ From Excel
+O comando 'View' é em caixa alta
+
+```{r}
+summary(dados_insetos)
+table(dados_insetos)
+View(dados_insetos)
+```
+_________________________________________________________________________________________________________________
+
+Matriz de Correlação
+Apenas as colunas 2 a 3, já que a coluna 1 é categórica.
+
+```{r}
+cor(dados_insetos[,2:3])
+```
+
+_________________________________________________________________________________________________________________
+
+Suposição de normalidade
+Teste de shapiro wilk
+Remova a coluna 1, já que ela é categórica
+
+```{r}
+mshapiro.test(t(dados_insetos[,-1]))
+```
+
+_________________________________________________________________________________________________________________
+
+Igualdade das variâncias
+Teste M de Box
+
+```{r}
+boxM(data = dados_insetos[, -1], grouping = dados_insetos$Race)
+```
+__________________________________________________________________________________________________________
+
+  **Seleção das variáveis**
+Medidas de qualidade
+
+```{r}
+discPower(variables = dados_insetos[,2:3], dados_insetos$Race)
+```
+
+   correl_ratio wilks_lambda F_statistic      p_value
+CP    0.6424787    0.3575213    37.73776 4.279757e-06
+CD    0.5382585    0.4617415    24.48000 6.781835e-05
+
+*A variável que melhor discrimina é a CP, visto o lâmbida menor e a maior correlação.*
+
+_________________________________________________________________________________________________________________
+
+Ajuste das funções discriminantes
+
+Modelo discriminante linear
+```{r}
+discrim_1 <- desDA(variables = dados_insetos[, c("CP", "CD")], 
+                   group = dados_insetos$Race)
+discrim_1
+```
+
+
+Coeficientes das funções discriminantes
+```{r}
+discrim_1$discrivar
+```
+*F1 =  18.53 -2.19xCP -1.08xCD*
+*CP é uma variável de maior peso.
+
+
+Autovalores das funções discriminantes e variabilidade explicada
+```{r}
+discrim_1$values
+```
+*Como só há uma função discriminante, ela explica 100 da própria variância.*
+
+
+Matriz de fatores para interpretação
+```{r}
+discrim_1$discor
+```
+
+
+Centróides
+```{r}
+dados_insetos$DF1 <- discrim_1$scores[,1]
+dados_insetos %>% group_by(Race) %>% summarise(C1 = mean(DF1))
+```
+
+
+Scatterplot
+*O scatterplot s[o seria feito se houvesse uma segunda função discriminante
+```{r}
+library(ggplot2)
+ggplot(data = dados_insetos, aes(x = DF1, y = DF2, colour = Race)) +
+  geom_hline(yintercept = 0, colour="gray70") +
+  geom_vline(xintercept = 0, colour="gray70") +
+  geom_point()
+```
+_________________________________________________________________________________________________________________
+
+Avaliação do ajuste
+Testes da significância das funções discriminantes
+Classificação real
+
+```{r}
+Y_real <- dados_insetos$Race
+
+escores <- discrim_1$scores
+mod <- lm(escores ~ Y_real)
+summary(mod)
+summary(aov(escores ~ Y_real), test="Wilks")
+```
+
+_________________________________________________________________________________________________________________
+
+
+Classificação - Funções de classificação
+
+Ajuste total
+```{r}
+fit <- linDA(variables = dados_insetos[, c("CP", "CD")], 
+             group = dados_insetos$Race)
+```
+
+
+Ajuste com cross-validaton
+```{r}
+fit2 <- linDA(variables = dados[, c("outdoor", "social", "conservative")], 
+             group = dados$job, validation = 'crossval')
+```
+
+
+Ajuste com amostras treinamento/teste
+```{r}
+treinamento <- sample(seq_len(nrow(dados)), size = 183) #75% dos dados
+teste <- setdiff(seq_len(nrow(dados)), treinamento)
+fit3 <- linDA(variables = dados[, c("outdoor", "social", "conservative")], 
+              group = dados$job, validation = 'learntest', learn = treinamento,
+              test = teste)
+```
+
+
+Ajuste com best subset selection
+```{r}
+fit4 <- 
+```
+
+
+```{r}
+
+```
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+
+_________________________________________________________________________________________________________________
+
+```{r}
+
+```
+

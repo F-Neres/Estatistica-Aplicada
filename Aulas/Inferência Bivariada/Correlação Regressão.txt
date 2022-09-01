@@ -1,0 +1,31 @@
+			Regressão e Correlação Linear Simples
+
+Y é explicado em relação a X
+Yi = alfa + beta*Xi + Ei
+Beta é o coeficiente da correlação
+Erro: mantendo o valor de X, diferença entre o valor Y de um ponto e o valor que ele teria se estivesse sobre a curva.
+
+Teste T para averiguar se o Beta é igual a zero: verifica se a regressão linear é a mais adequada.
+
+	Regressão
+Cada observação possui um valor Y e um valor X
+Gl = n-2
+1. Encontrar uma média X
+2. Para cada observação, definir o erro X, como a diferença enter Xi e a média X
+. Elevar os erros ao quadrado (Exi²)
+. Soma dos erros quadrados de X
+. Encontrar uma média Y
+. Para cada observação, definir o erro Y, como a diferença enter Yi e a média Y
+. Elevar os erros ao quadrado (Eyi²)
+. Soma dos erros quadrados de Y
+. Definir o erro XY, multiplicando os erros X pelos erros Y
+. Soma dos erros XY
+. Beta médio = "soma dos erros XY" / "soma dos quadrados dos erros de X"
+. Alfa médio = "Média de Y" - ("Beta médio" * "Média de X")	
+. Encontrar valores esperados de Y seguindo: Y=Alfa+Beta*X
+. Desvio = Yi - Y{espedado}i
+. Os desvios são elevados ao quadrado
+. Soma dos desvios quadrados
+. "Erro padrão" = raiz(("Soma dos desvios quadrados"/Gl) / "Soma dos erros quadrados de X")
+. t = "Beta médio" / "Soma dos erros XY"
+. Correlação de Pearson

@@ -1,0 +1,110 @@
+---
+title: "Exercício Final - A Contenda"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+  Exercício 8
+
+Criando o banco de dados
+```{r}
+dados.democracia <- read.csv2("C:/Users/logonlb/Desktop/MEE/Dados/dados-democracia.csv")
+View(dados.democracia)
+```
+
+Carregando pacote
+```{r}
+library(lavaan)
+install.packages("semPlot")
+library(semPlot)
+```
+
+
+Especificação do modelo
+```{r}
+mdldemo <- 'demo60 =~ 1*y1 + y2 + y3 + y4
+demo65 =~ 1*y5 + y6 + y7 + y8
+indust60 =~ 1*x1 + x2 + 1*x3
+demo60 ~ indust60
+demo65 ~ demo60 + indust60
+y1 ~~ y5
+y2 ~~ y4
+y2 ~~ y6
+y3 ~~ y7
+y4 ~~ y8
+y6 ~~ y8
+demo60 ~~ demo65'
+```
+
+
+
+
+
+Identificação do modelo
+q = 28
+  4 da primeira fatorial
+  4 da segunda fatorial
+  5 da terceira fatorial
+  7 correlações
+  11 variâncias de mensuradas
+  -3 pré-estipuladas
+p = 66
+p(p+1)/2 = 11*12/2 = 66
+Identificável
+
+
+
+Estimação do modelo
+```{r}
+modfit8 <- sem(mdldemo, data= dados.democracia, std.lv = TRUE)
+summary(modfit8)
+```
+
+
+Diagrama de caminhos
+```{r}
+semPaths(modfit8)
+```
+
+
+```{r}
+summary(modfit8, fit.measures = TRUE)
+```
+
+Qui-quadrado = 0.
+CFI = 0.906; Se maior que 0,8, então ok.
+TLI = 0.865; ajuste perfeito (maior que 0,8).
+RMSEA = 0.149; necessário abaixo de 0,05.
+SRMR = 0.268; necessário abaixo de 0,05; nada bom.
+
+
+
+
+
+Modelo 2
+```{r}
+mdldemo2 <- 'demo60 =~ 1*y1 + y2 + y3 + y4
+demo65 =~ 1*y5 + y6 + y7 + y8
+indust60 =~ 1*x1 + x2 + 1*x3
+demo60 ~ indust60
+demo65 ~ demo60 + indust60
+y1 ~~ y5
+y2 ~~ y4
+y2 ~~ y6
+y3 ~~ y7
+y6 ~~ y8
+demo60 ~~ demo65'
+
+
+modfit8.2 <- sem(mdldemo2, data= dados.democracia, std.lv = TRUE)
+summary(modfit8.2)
+```
+
+
+
+```{r}
+summary(modfit82, modindices = TRUE)
+```

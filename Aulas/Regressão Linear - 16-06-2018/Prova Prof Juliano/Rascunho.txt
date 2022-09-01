@@ -1,0 +1,43 @@
+		Geral
+	Residuals vs Fitted
+A média dos resíduos deve permanecer próxima de zero e a variância constante ao longo de toda a curva.
+	Normal Q-Q
+As observações devem obedecer uma linearidade para que os resíduos possam ser considerados respeitando uma distribuição normal
+	Scale-Location
+	Residuals vs Leverage
+
+		Modelo 1
+	Residuals vs Fitted
+A média dos resíduos não permanece próxima de zero ao longo de todo o modelo.
+Observa-se um padrão que não respeita o princípio de linearidade (a relação entre y1 e x não é linear)
+Recomenda-se utilizar um modelo de regressão não-linear.
+	Normal Q-Q
+Observa-se um padrão linear ao relacionar os resíduos padronizados com quantis teóricos de uma distribuição normal (conforme o gráfico Normal Q-Q), indicando que os resíduos obedecem a uma distribuição normal.
+	Scale-Location
+Demonstra o mesmo que o gráfico "Residual vs Fitted"
+	Residuals vs Leverage
+
+		Modelo 2
+	Residuals vs Fitted
+A média dos resíduos permanece próxima de zero ao longo de todo o modelo.
+Observa-se um padrão que respeita o princípio de linearidade (a relação entre y1 e x é linear)
+	Normal Q-Q
+Observa-se um padrão linear ao relacionar os resíduos padronizados com quantis teóricos de uma distribuição normal (conforme o gráfico Normal Q-Q), indicando que os resíduos obedecem a uma distribuição normal.
+	Scale-Location
+Demonstra o mesmo que o gráfico "Residual vs Fitted"
+	Residuals vs Leverage
+
+		Modelo 3
+	Residuals vs Fitted
+A média dos resíduos não permanece próxima de zero ao longo de todo o modelo.
+Observa-se um padrão que não respeita o princípio de linearidade (a relação entre y1 e x não é linear)
+Recomenda-se utilizar um modelo de regressão não-linear.
+	Normal Q-Q
+Observa-se um padrão não-linear ao relacionar os resíduos padronizados com quantis teóricos de uma distribuição normal (conforme o gráfico Normal Q-Q), indicando que os resíduos não obedecem a uma distribuição normal.
+	Scale-Location
+Demonstra o mesmo que o gráfico "Residual vs Fitted"
+	Residuals vs Leverage
+—
+
+Alguns pontos em todos os três modelos podem ser apontados como possíveis outliers, mesmo que pareçam não tão discrepantes dos demais ao serem observados no gráfico de Resíduos vs Alavancagem.
+Recomenda-se verificar se houve algum erro ao coletar ou registrar os dados. Pode ainda haver alguma variável com a qual o modelo não lida e que pode ser relevante para explicar a relação entre as variável analisadas.

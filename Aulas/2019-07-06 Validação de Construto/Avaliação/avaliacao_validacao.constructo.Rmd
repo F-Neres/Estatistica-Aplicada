@@ -1,0 +1,169 @@
+---
+title: "Validacao de Constructo - AvaliaÃ§Ã£o"
+author: "Liziane, Felipe Neres, Leandro Sampaio, Patricia"
+date: "6 de julho de 2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if(!require(irr)){install.packages('irr')}
+if(!require(psych)){install.packages('psych')}
+if(!require(dplyr)){install.packages('dplyr')}
+if(!require(psychometric)){install.packages('psychometric')}
+if(!require(semTools)){install.packages('semTools')}
+if(!require(semPlot)){install.packages('semPlot')}
+if(!require(purrr)){install.packages('purrr')}
+```
+
+## Introdução
+
+  Foi realizado um teste avaliativo para o curso de pós-graduação em estatística aplicada da turma de 2018-2019 na Universidade Cruzeiro do Sul. 11 alunos responderam a um questionário contendo 10 questões relativas a diferentes características do curso, sendo as respostas dispostas numa escala de 1 a 5, conforme segue:
+  
+1 - péssimo; 
+2 - ruim; 
+3 - padrão; 
+4 - bom; 
+5 - ótimo.
+
+  As questões foram convertidas em variáveis e separadas em três grandes características que foram representadas como fatores. As questões apresentadas no questionário foram nomeadas e agrupadas como segue:
+  
+    ESTRUTURA
+  
+  Recursos - "Como você avalia a disponibilidade de recursos em geral?" 
+  
+  Predial - "Como avalia a estrutura predial (prédio, acesso, segurança, comodidades)?"
+  
+  ADM- "Como avalia a administração do curso?". 
+
+    CONHECIMENTO
+  
+  Assimilado - "Como avalia o seu conhecimento assimilado do curso?"
+  
+  Dominio.prof - "Como você avalia, de forma geral, o conhecimento dos professores?"
+  
+  Grade - "Como você avalia a grade curricular do curso?"
+  
+  Avaliacao - "Como você avalia a forma de avaliação das matérias do curso?"
+
+    COMODIDADE
+  
+  Acessso - "Como você avalia o acesso ao local do curso?"
+  
+  Horário - "Você acha os horários e carga horária adequadas?"
+  
+  Periodicidade - "Como você avalia a periodicidade das aulas?"
+  
+
+  Os testes realizados neste trabalho servirão para validar os constructos criados a priori, levando em conta que o questionário foi realizado apenas uma vez, não sendo possível prosseguir com validações que exigiriam mais matrizes de respostas.
+
+## 1. Equivalencia
+
+### Inter-rater
+
+```{r}
+setwd("D:/Documentos/Estatística/Aulas/2019-07-06 Validação de Construto/Avaliação")
+```
+
+Concordância entre os respondentes:
+```{r}
+dados <-read.csv('satisfacao.csv', sep=';', dec=',') 
+cor(dados)
+irr::agree(t(dados))
+```
+  Algumas correlações entre as variáveis, embora altas, não indicam que uma mesma característica tenha sido medida por mais de uma questão.
+  Já o porcentual de concordância foi zero; logo, não há respostas idênticas entre os entrevistados.
+
+
+Verificação da confiabilidade inter-rater:
+```{r message=FALSE, paged.print=FALSE}
+psych::cohen.kappa(t(dados))
+```
+
+  Os respondentes têm opiniões muito discrepantes entre si. Apenas os respondentes 1 e 10 (Kappa = 0,667) e os respondentes 5 e 9 (Kappa = 0,851) responderam de forma semelhante.
+
+
+## 2. Consistencia interna
+
+### Coeficiente Alfa
+
+Geral:
+```{r}
+psych::alpha(dados, check.keys=TRUE)$total$std.alpha
+```
+  O valor de alfa para todas as variáveis foi de 0,90,o que significa boa confiabilidade de que as variáveis mensuráveis estão relacionadas com seus respectivos constructos.
+  
+  A verificação de consistência interna deve ser verificada para cada constructo, como segue.
+
+Estrutura:
+
+```{r}
+estrutura <- dplyr::select(dados, c(Recurso, Predial, ADM))
+psych::alpha(estrutura)$total$std.alpha
+```
+
+Conhecimento:
+
+```{r}
+conhecimento <- dplyr::select(dados, c(Assimilado,Dominio.prof, Grade, Avaliacao))
+psych::alpha(conhecimento, check.keys=TRUE)$total$std.alpha
+```
+
+  O fator conhecimento apresentou alfa de 0,68, o que significa consistência interna fraca.
+  Observando a matriz de correlação, as variáveis "Assimilado" e "Grade" são as únicas dentre as que compõem o fator "Conhecimento" a apresentar correlação alta. O teste será refeito, mas excluindo as demais variáveis que excluem esse constructo.
+
+```{r}
+conhecimento2 <- dplyr::select(dados, c(Assimilado, Grade))
+psych::alpha(conhecimento2)$total$std.alpha
+```
+  Retirando as variáveis "Dominio.prof" e "Avaliação" o resultado do alfa foi de 0,92, uma melhora considerável da consistência interna.
+
+Comodidade:
+
+```{r}
+comodidade <- dplyr::select(dados, c(Acesso, Horario, Periodicidade))
+psych::alpha(comodidade)$total$std.alpha
+```
+
+  Ademais, "Comodidade" e "Estrutura" demonstraram grande consistência interna.
+
+
+# Validade
+
+## 2. Constructo
+
+### A. Validade Convergente e Validade Discriminante
+
+```{r}
+
+Satisfacao_cfa_model<-"ESTRUTURA =~ Recurso+Predial+ADM
+CONHECIMENTO =~Assimilado+Dominio.prof+Grade+Avaliacao
+COMODIDADE =~ Horario+Acesso+Periodicidade"
+
+Satisfacao_CFA<-lavaan::cfa(model=Satisfacao_cfa_model, data=dados)
+
+# Summarize results with fit measures and standardized estimates
+summary(Satisfacao_CFA, fit.measures=T, standardized=T)
+```
+  O modelo desconsiderou a composição das variáveis "Dominio.prof" e "Avaliacao" pelo fator "CONHECIMENTO" não foram significantes, sendo retirada no ajuste seguinte.
+
+```{r}
+
+Satisfacao_cfa_model<-"ESTRUTURA =~ Recurso+Predial+ADM
+CONHECIMENTO =~Assimilado+Grade
+COMODIDADE =~ Horario+Acesso+Periodicidade"
+
+Satisfacao_CFA<-lavaan::cfa(model=Satisfacao_cfa_model, data=dados)
+
+# Summarize results with fit measures and standardized estimates
+summary(Satisfacao_CFA, fit.measures=T, standardized=T)
+```
+  Considerando a limitação do número amostral e a natureza das observações, o resultado pode ser considerado adequado.
+
+```{r}
+# Construct validity
+semTools::reliability(Satisfacao_CFA)
+```
+  Os coeficientes ômega indicam que nenhum dos contructos é convergente, enquanto a variância média extraída demonstra que todos os constructos são discriminantes. Ou seja, sabe-se que não se está medindo a mesma grandeza em constructos diferentes, porém, eles não possuem relação uns com os outros (isso trás implicações na busca de um escore geral).

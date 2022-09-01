@@ -1,0 +1,63 @@
+		Pressupostos
+
+	Teste M de Box:
+Teste de igualdade entre as matrizes de covariância (par a par das variáveis) de cada grupo.
+H0: As matrizes de variância/covariância são iguais.
+P<0,01: As matrizes são diferenes (não fazer LDA).
+
+	V1	V2	V3	V4
+V1	0,5	-0,6	0,2	0,8
+V2	0,9	0,6	-0,7	-0,7
+V3	-0,5	0,5	0,5	0,8
+V4	0,6	0,9	-0,4	-0,4
+
+	V1	V2	V3	V4
+V1	-0,7	0,9	-0,6	-0,7
+V2	-0,8	-0,6	0,3	0,3
+V3	0,3	-0,3	-0,6	-0,7
+V4	-0,9	-0,6	0,8	0,3
+
+Vê-se que as matrizes são pela diferença dos sinais das mesmas variâncias e covariâncias em cada matriz.
+
+A quantidade de classes não pode ser maior que o número de variáveis independentes.
+
+Evitar utilizar variáveis altamente correlacionadas.
+
+Deve haver linearidade entre as variáveis independentes.
+Caso não haja linearidade (algum padrão, como quadrático, cúbico, exponencial), transformar os dados da variável.
+
+	Transformação de escala
+Transformar os dados das variáveis em variâncias iguais a 1 e média igual a 0.
+
+
+		Interpretação
+
+O LDA tenta otimizar a diferença das médias e menor valor das variâncias para Z.
+
+A primeira função discriminante é aquele que tiver os maiores pesos.
+
+Os centróides são pontos que representam as médias dos valores de seu grupos.
+
+	Manova
+H0 : centroides são iguais.
+P<0,05 : os centroides são significantemente distintos; a LDA foi bem sucedida separando os grupos.
+
+	Distância de Mahalanobis
+A proximidade cartesiana entre a observação e o centroide do seu grupo define o quão bem ele pode ser classificado.
+Define a probabilidade de determinada observação pertencer a determinado grupo.
+
+	Matriz confusão
+Q de Press - significância chi² da matriz confusão.
+
+	Importância das variáveis
+Cada função separa, em ordem, os grupos melhor definidos.
+Matriz de correlações entre variáveis independentes e valores de Z das observações.
+As variáveis com maior correlação com a função foram mais relevantes para a separação do grupo.
+
+	Discriminante x Logística
+Mais grupos
+
+variáveis métricas
+normalidade multivariada
+linearidade das variáveis preditoras
+Igualdade entre as matrizes

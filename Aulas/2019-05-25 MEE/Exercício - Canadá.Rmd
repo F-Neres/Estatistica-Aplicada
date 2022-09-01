@@ -1,0 +1,68 @@
+---
+title: "Exercício 7"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Os dados-canada.csv referem-se ao questionário para o Estudo de Eleição Nacional Canadense de 1997 e são destinados a estudar a influência da atitude em relação aos valores tradicionais. O conjunto contém 1529 observações e seguintes quatro variáveis
+
+MBSA2: fator ordenado com níveis "Discordo totalmente", "Discordo", "Concordo" e "Concordo totalmente" para a questão "Nós deveríamos ser totalmente tolerantes com as pessoas que escolhem viver de acordo com seus próprios padrões, mesmo se eles forem muito diferentes"
+
+
+Carregando pacote
+```{r}
+library(lavaan)
+```
+
+```{r}
+dados_canada <- read.csv("C:/Users/logonlb/Desktop/MEE/Dados/dados_canada.csv", sep=";")
+View(dados_canada)
+```
+
+
+a) Expresse o modelo em termos de equações
+
+```{r}
+mdlCanada <- 'opinion =~ MBSA2.2 + MBSA7.2 + MBSA8.2 + MBSA9.2'
+```
+
+
+b) defina se o modelo é identificável
+
+Identificação do modelo
+q = 8
+p = 4
+p(p+1)/2 = 4*5/2 = 10
+Identificável
+
+
+c) Utilizando o método de Máxima Verossimilhança, estime o modelo e comente.
+
+```{r}
+modfit7 <- sem(mdlCanada, data = dados_canada, std.lv = TRUE)
+summary(modfit7)
+```
+MBSA2 e MBSA8 influenciam positivamente o fator criado, enquanto que MBSA7 e MBSA9 influenciam negativamente.
+O fator representa o nível de liberalismo na opinião do respondente.
+
+
+d) Analise a qualidade do ajuste.
+
+```{r}
+summary(modfit7, fit.measures = TRUE)
+```
+Qui-quadrado = 0; a diferença entre as matrizes não é zero e o modelo não é ajustado.
+CFI = 0.973; bom se acima de 0.8
+TLI = 0.920; bom se acima de 0.8
+RMSEA = 0.079 / p-valor = 0.048; bom se abaixo de 0.05
+SRMR = 0.029; bom (resíduos pequenos) se abaixo de 0.08
+
+
+```{r}
+summary(modfit7, modindices = TRUE)
+```
+
+

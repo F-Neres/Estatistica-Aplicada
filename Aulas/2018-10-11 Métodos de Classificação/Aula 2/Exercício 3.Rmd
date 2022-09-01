@@ -1,0 +1,164 @@
+---
+title: "Exercício 3 - Aula 2"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Abra o arquivo "dados_doenca.xls"
+
+```{r}
+dados_doenca <- read.csv('C:/Users/logonlb/Desktop/Material Aula 2 Análise Discriminante/dados_doenca.csv', sep = ';', dec = ',') %>%
+  select(LO3, 
+         ANGEST,
+         AH,
+         IMP,
+         TRIGS,
+         COLS,
+         IDADE1,
+         SEXO)
+dados_doenca <- na.omit(dados_doenca)
+View(dados_doenca)
+```
+
+Separarar entre treino e teste
+
+```{r}
+set.seed(0)
+treinamento <- sample(seq_len(nrow(dados_doenca)), size = 1125)
+
+doenca_treino <- dados_doenca[treinamento,]
+doenca_teste <- dados_doenca[-treinamento,]
+
+View(doenca_teste)
+View(doenca_treino)
+```
+
+_____________________________________________________________________________
+
+   Regressão Linear
+
+```{r}
+ajuste_reg_lin <- lm(LO3 ~ ANGEST + AH + IMP + TRIGS + COLS + IDADE1 + SEXO,
+                     data = doenca_treino)
+prob_posteriori <- predict.lm(ajuste_reg_lin, newdata = doenca_teste[, -1])
+prob_posteriori
+classificacoes <- ifelse(prob_posteriori > 0.5, 1, 0) #Separa os que são acima e abaixo de meio
+classificacoes
+tab_confusao <- table(classificacoes, doenca_teste$LO3)
+tab_confusao
+taxa_acertosRLn <- (tab_confusao[1,1] + tab_confusao[2,2])/sum(tab_confusao)
+taxa_acertosRLn
+```
+
+_____________________________________________________________________________
+
+   Regressão Logística
+
+```{r}
+ajuste_reg_log <- glm(LO3 ~ ANGEST + AH + IMP + TRIGS + COLS + IDADE1 + SEXO, 
+                      family = binomial(link = 'logit'), data = doenca_treino)
+ajuste_reg_log
+
+p <- mean(doenca_treino$LO3) #Regra de classificação proporcional
+p
+
+log_chances <- predict.glm(ajuste_reg_log, newdata = doenca_teste[, -1])
+prob_posteriori <- exp(log_chances)/(1+exp(log_chances))
+prob_posteriori
+classificacoes <- ifelse(prob_posteriori > p, 1, 0) 
+classificacoes
+tab_confusao <- table(classificacoes, doenca_teste$LO3)
+taxa_acertosRLg <- (tab_confusao[1,1] + tab_confusao[2,2])/sum(tab_confusao)
+taxa_acertosRLg
+```
+
+_____________________________________________________________________________
+
+   Análise Discriminante Linear
+
+```{r}
+fit <- linDA(variables = doenca_treino[, -1], 
+             group = doenca_treino$LO3)
+
+classificacoes <- classify(fit, newdata = doenca_teste[, -1])$pred_class
+tab_confusao <- table(classificacoes, doenca_teste$LO3)
+taxa_acertosADL <- (tab_confusao[1,1] + tab_confusao[2,2])/sum(tab_confusao)
+taxa_acertosADL
+```
+
+_____________________________________________________________________________
+
+   Análise Discriminante Quadrática
+
+```{r}
+fit <- quaDA(variables = doenca_treino[, -1], 
+             group = doenca_treino$LO3)
+
+classificacoes <- classify(fit, newdata = doenca_teste[, -1])$pred_class
+tab_confusao <- table(classificacoes, doenca_teste$LO3)
+taxa_acertosADQ <- (tab_confusao[1,1] + tab_confusao[2,2])/sum(tab_confusao)
+taxa_acertosADQ
+```
+
+_____________________________________________________________________________
+
+   Árvore de Classificação
+
+```{r}
+set.seed(0)
+library(rpart)
+
+# Ajustar a árvore:
+fit <- rpart(LO3 ~ ANGEST + AH + IMP + TRIGS + COLS + IDADE1 + SEXO,
+             method="class", data = doenca_treino)
+fit
+
+# poda:
+melhorCp = fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"]
+melhorCp
+
+# cp é uma medida de complexidade da árvore, essencialmente
+# proporcional ao número de folhas presentes. Este código
+# escolhe o melhor cp via validação cruzada.
+pfit <- prune(fit, cp = melhorCp)
+pfit
+
+# plotar árvore podada
+plot(pfit)
+text(pfit,use.n=FALSE,all=FALSE,cex=1.5)
+dev.off()
+
+# Classificação
+classificacoes <- predict(pfit, doenca_teste[,-1], type = 'class')
+tab_confusao <- table(classificacoes, doenca_teste$LO3)
+taxa_acertosAC <- (tab_confusao[1,1] + tab_confusao[2,2])/sum(tab_confusao)
+taxa_acertosAC
+```
+
+_____________________________________________________________________________
+
+   KNN
+
+```{r}
+library(class)
+ajuste = knn(train = doenca_treino[,-1], test = doenca_teste[,-1], 
+             cl = doenca_treino$LO3, k = 50)
+tab_confusao <- table(ajuste, doenca_teste$LO3)
+taxa_acertosKNN <- (tab_confusao[1,1] + tab_confusao[2,2])/sum(tab_confusao)
+taxa_acertosKNN
+```
+
+_____________________________________________________________________________
+
+   Lista de taxas de Acerto
+
+```{r}
+taxa_acertosRLn
+taxa_acertosRLg
+taxa_acertosADL
+taxa_acertosADQ
+taxa_acertosKNN
+```

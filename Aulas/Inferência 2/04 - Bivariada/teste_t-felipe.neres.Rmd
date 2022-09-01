@@ -1,0 +1,348 @@
+---
+title: "Estatística Aplicada - Teste t"
+author: "J van Melis"
+date: "14 de abril de 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Esse é um arquivo R Markdown. É uma forma simples de exportar análises realizadas no R (sintaxes realizadas na linguagem R) para formatos como HTML, PDF ou MS Word. Para mais detalhes entre no site: <http://rmarkdown.rstudio.com>.
+
+Ao clicar no botão superior **Knit**, um documento será gerado, mostrando trechos escritos e *outputs* das sintaxes do R (gráficos, resultados de análises). Para incluir um trecho da linguagem neste arquivo aperte 6x a crase (`) sendo que entre a terceira e quarta crase, quebre essa sequencia em duas linhas e insira um par de chaves com a letra r no meio, dessa maneira:
+
+```{r}
+2
+```
+
+O conteúdo que for inserido nessa área cinzenta poderá ser rodada em seu RStudio, apertando o botão no formato de triângulo, no canto superior direito desse *chunck* (área cinzenta), podendo ver o conteúdo enquanto escreve outras informações. Dessa maneira:
+
+```{r}
+set.seed(52)
+x <- 1:100
+y <- rnorm(100)
+mean(x)
+mean(y)
+```
+
+Mantendo as informações posteriormente.
+    * Se você quiser, pode esconder o código no formato final escrevendo `echo=F`
+
+```{r, echo=FALSE}
+plot(x,y)
+```
+
+Você ainda poderá enriquecer o seu texto como:
+
+- Inserir um elemento que existente no ambiente do R, como o 1o elemento de `x` = `r x[1]`  
+  
+- Inserir formatos Latex, como letras gregas $\alpha$  e   $\beta$ ou fórmulas $\int_0^\infty \mathrm{e}^{-x}\,\mathrm{d}x$
+
+- Colocar niveis diferentes de Titulos, sendo que com 1# Titulo 1, 2# Titulo 2 e por diante...
+
+- Usar asteriscos (`*`) para fazer *itálico* ou **negrito**.
+
+- Etc...
+
+
+# O teste t pelo R
+
+Lembrando dos passos a serem realizados para um teste t:
+
+(i) Estabelecer hipóteses nula e alternativa;
+
+(ii) Verificar pressupostos;
+
+(iii) Estabelecer significância do teste;
+
+(iv) Calcular estatística do teste;
+
+(v) Observa p-valor;
+
+(vi) Concluir
+
+Vamos então executar on R:
+
+## (i). Estabelecer as hipóteses (nula e alternativa);
+
+No R já existem alguns banco de dados e cada pacote também incorpora outros `datasets`, veja por exemplo o banco de dados `mtcars`, que mostra dados de carros fabricados nos EUA nos últimos anos:
+
+```{r}
+data("mtcars")
+head(mtcars)
+```
+
+A hipótese que vamos testar é: "Modelos de carros automáticos consomem mais do que modelos de carros manuais?"
+
+Por isso, a nossa hipótese é considerada **unicaudal**, pois quer ver se automáticos consomem mais do que manuais:
+
+Carro automático/manual está listado na coluna `am`, sendo `1` para automático e `0` para manual.
+
+O consumo é a coluna `mpg`, que significa milhas por galão. Nesse caso, quanto mais econômico for o carro, maior será seu valor de `mpg` (pois anda mais milhas com menos galão consumido).
+
+Dessa maneira a nossa hipótese alternativa (o que queremos mostrar) é:
+
+$$H_{1}: \overline{X}_{automático} < \overline{X}_{manual}$$
+
+
+Considerando a nossa hipótese alternativa o contrário da Hipótese nula, estabelecemos portanto a nossa H0:
+
+$$H_{0}: \overline{X}_{automático} = \overline{X}_{manual}$$
+
+Dessa maneira, as nossa hipóteses nula e alternativas são:
+
+$$H_{0}: \overline{X}_{automático} = \overline{X}_{manual} > 0 $$
+
+$$H_{1}: \overline{X}_{automático} - \overline{X}_{manual} < 0$$
+
+
+Se o nosso teste fosse **bicaudal**, ao invés de $<$ (H1) e $>$ (H0) seria $\neq$ (H1) e $=$ (H0).
+
+Vamos separar os valores em dois vetores distintos: `autom` (consumo de carros automáticos) e `manual` (consumo de carros com câmbio manual)
+
+```{r}
+autom <- mtcars$mpg[mtcars$am==1]
+manual <- mtcars$mpg[mtcars$am==0]
+autom
+manual
+```
+
+## (ii).  Verificar pressupostos;
+
+Os pressupostos são:   
+- Independência das observações;
+- Distribuição normal dos dados;  
+- Homogeneidade das variâncias.
+
+Para verificarmos tais afirmações é necessário: conhecimento dos dados e Análise Exploratória dos Dados (AED). 
+As observações são independentes, pois cada carro só foi mensurado uma única vez.
+
+Para desempenharmos a AED, primeiramente vamos ver as médias (`mean()`), números amostrais (`length()`), desvios-padrão (`sd()`) de cada grupo. 
+
+```{r}
+media_auto <- mean(autom)
+media_manu <- mean(manual)
+paste("Media de Automatico =", media_auto)
+paste("Media de Manual =", media_manu)
+
+n_auto <- length(autom)
+n_manu <- length(manual)
+paste("Numero de Automatico =", n_auto)
+paste("Numero de Manual =", n_manu)
+
+
+sd_auto <- sd(autom)
+sd_manu <- sd(manual)
+paste("Desvio-Padrao de Automatico =", sd_auto)
+paste("Desvio-Padrao de Manual =", sd_manu)
+
+```
+
+Depois uniremos os dois vetores em um único chamado `consumo` e para sabermos a qual grupo pertence, construíremos outro vetor com o nome `cambio`, unindo-os em um `data.frame` chamado `carros`:
+
+```{r}
+carros <- data.frame(consumo = c(autom, manual),
+                     cambio = c(rep("auto", times = length(autom)),
+                                rep("manu", times= length(manual)) ) )
+carros
+```
+
+Para então criarmos um boxplot para visualizarmos melhor os dados da AED:
+
+```{r}
+boxplot(consumo~cambio, data=carros)
+```
+
+Parece que os carros automáticos mostram maior rodagem por galão (`mpg`) do que os carros com cambio manual.
+
+Mas será que os dados seguem uma distribuição Normal? Para isso, podemos fazer o teste de shapiro:
+
+```{r}
+shapiro.test(autom)
+shapiro.test(manual)
+```
+
+Sendo que o teste de Shapiro-Wilk tem como *H0: os dados seguem a distribuição normal*.
+Tradicionalmente, consideramos como significativo, temos que a probabilidade erro tipo I aceita ($\alpha$) é de 5%, e os nossos p-valores são superiores a esse valor (0.53 e 0.89), podemos afirmar que não podemos rejeitar a Hipótese Nula, aceitando-a: **os nossos dados seguem a distribuição**.
+
+Outra maneira de explorar a normalidade dos dados é usar a função `qqnorm()`:
+
+```{r}
+par(mfrow=c(1,2)) #próximos gráficos (linha e coluna=c(linhas,colunas))
+qqnorm(autom, main = "Carros Automáticos"); qqline(autom)
+qqnorm(manual, main = "Carros cambio Manual"); qqline(manual)
+
+```
+
+Que mostra que os quantis da distribuiçao dos dados observados é semelhante a uma distribuiçao normal teórica (pontos estao proximos da linha).
+Logo, podemos concluir que os **nossos dados seguem a distribuição normal**
+
+Finalmente, verificamos se as variâncias sao semelhantes. Um dos testes a ser utilizado é o de Bartlett:
+
+```{r}
+bartlett.test(consumo ~ cambio, data = carros)
+```
+
+O p-valor foi de `r (bartlett.test(consumo ~ cambio, data = carros))$p.value`, equivalendo a 7,2% de probabilidade de erro tipo I. Como a nossa Hipótese Nula no teste de Bartlett é de que *as variâncias são iguais* e, tradicionalmente, *consideramos que valores acima de 5% de erro tipo I como não significativo* suficiente (deveria ser abaixo de 5%), portanto, nós não rejeitamos a nossa hipótese nula e a aceitamos, concluindo que: **As variâncias entre os dois grupos são iguais**.
+
+Pode ser realizado também o Teste F para comparação de duas variâncias
+
+```{r}
+var.test(consumo ~ cambio, data = carros)
+```
+
+Que também chegou a mesma conclusão.
+
+
+## (iii) Estabelecer probabilidade de erro tipo I
+
+Essa é a probabilidade de erro tipo I aceitável , também chamada de nível de significância).
+Normalmente:
+
+$\alpha < 0.05$
+
+## (iv) Calcular a estatística do teste 
+
+valor do $T_{calculado}$ 
+
+Pode ser feita *a mão*:
+
+```{r}
+erro <- sqrt( 
+              ( 
+                ( (n_auto-1) * sd_auto^2 ) +
+                ( (n_manu-1) * sd_manu^2 ) 
+                                             )/
+                (n_auto+n_manu-2)
+                )
+  
+
+t_calc <- (media_auto - media_manu) / (erro*sqrt((1/n_auto)+(1/n_manu) ))  
+  
+t_calc
+```
+
+Para depois determinar o p-valor a partir do $t_{calculado}$, ou simplesmente usar o algoritmo pronto do R: `t.test`:
+
+```{r}
+resultado <- t.test(x = autom,
+                    y = manual, 
+                    alternative='less',
+                    var.equal=TRUE)
+resultado
+```
+
+## (v)  Determinar o p-valor 
+
+Use a função `pt()` para saber qual é a probabilidade acumulada de valores entre o `-Inf` até o quantil calculado (`t_calc` = `r t_calc`):
+
+
+```{r}
+pt(t_calc, df=(n_manu+n_auto-2))
+
+```
+
+Se p-valor < 0.05: Rejeite H0 (aceitamos H1)
+
+Se p-valor > 0.05: Não rejeite H0 (aceitamos a H0)
+
+o `resultado` de `t_test()` já traz o p-valor calculado em seu output:
+
+```{r}
+(resultado)
+```
+
+## (vi)  Concluir e reportar por extenso
+
+Como p>0.05, **não rejeitamos a hipótese unilateral** de que a média de consumo (`mpg`) de carros automáticos é menor do que a média de consumo dos carros com câmbio manual.
+
+
+Vale ressaltar que, se o nosso pressuposto inicial era que o consumo entre os carros com dois tipos de câmbio (manual e automático), simplesmente faríamos um **teste bilateral** e não teríamos que ver somente um lado da curva da distribuição t, mas para ambos os lados.
+Isso mudaria o nosso resultado:
+
+```{r}
+bicaudal <- t.test(x = autom,
+                    y = manual, 
+                    alternative='two.sided',
+                    var.equal=TRUE)
+bicaudal
+```
+
+Com p-valor < 0.05, logo, há diferença significativa entre as médias, onde carros automáticos apresentam média superior (24.392) aos carros com cambio manual (17.147).
+Isso pode ser explicado pois carros mais antigos só tinham cambio manual e possuiam cambio manual, contra os modernos de hoje em dia, onde a maioria apresenta consumo baixo (andam muitas milhas com um galão).
+
+
+# Agora faça você mesmo
+
+Usando somente as funções: `shapiro.test()`, `bartlett.test()` e `t.test()`, avalie se há diferença significativa entre as médias do comprimento de pétalas entre as espécies `setosa` e `virginica` quanto ao comprimento de suas pétalas
+
+```{r}
+data("iris")
+setosa <-iris$Petal.Length[iris$Species=='setosa'] 
+
+virgin <-iris$Petal.Length[iris$Species=='virginica']  
+
+flores <- data.frame(petalas = c(setosa, virgin),
+                     especies = c(rep('setosa',50), rep('virginica', 50)))
+
+flores
+```
+```{r}
+mean.s <- mean(setosa)
+mean.v <- mean(virgin)
+
+paste("Media do comprimento das pétalas da espécie setosa =", mean.s)
+paste("Media do comprimento das pétalas da espécie virginica =", mean.v)
+```
+
+Lembre-se dos passos a serem realizados para um teste t:
+
+(i) Estabelecer hipóteses nula e alternativa;
+
+*H0: Média do comprimento das pétalas da espécie "setosa" é igual à media do comprimento das pétalas da espécie "virginica".*
+$$H_{0}: \overline{X}_{setosa} = \overline{X}_{virginica}$$
+*H1: Média do comprimento das pétalas da espécie "setosa" é diferente à media do comprimento das pétalas da espécie "virginica".*
+$$H_{1}: \overline{X}_{setosa} \neq \overline{X}_{virginica}$$
+
+(ii) Verificar pressupostos;
+- Independencia das observações
+As observações são independentes, pois cada indivítuo só foi mensurado uma única vez.
+
+- Normalidade
+
+```{r}
+shapiro.test(setosa)
+shapiro.test(virgin)
+```
+
+*Sendo as probabilidades de erro tipo I de ambas amostras, equivalentes a 5,481% para a espécie setosa e 10,98% para a espécie virginica, não significativas, considerando nível de significância de 5%, aceita-se a hipótese nula de que as amostras seguem distribuição normal.*
+
+- Homocedasticidade
+
+```{r}
+bartlett.test(petalas ~ especies, data= flores)
+```
+
+O p-valor foi equivalente a 7,2% de probabilidade de erro tipo I. Como a nossa Hipótese Nula no teste de Bartlett é de que as variâncias são iguais e, tradicionalmente, consideramos que valores acima de 5% de erro tipo I como não significativo* suficiente (deveria ser abaixo de 5%), portanto, nós não rejeitamos a nossa hipótese nula e a aceitamos, concluindo que: As variâncias entre os dois grupos são iguais.
+
+*Sendo as probabilidades de erro tipo I, de que se rejeite a hipótese nula de que as variâncias são iguais enquanto elas de fato são, equivalente a 0,00000000001922%, inferior ao nível de significância recorrente de 5%, rejeita-se a hipótese nula de que as variâncias das amostras das espécies setosa e virginica sejam iguais.*
+
+(iii) Estabelecer significância do teste;
+
+$$\alpha < 0.05$$
+
+(iv) Calcular estatística do teste;
+
+```{r}
+t.test(x = setosa, y = virgin, alternative='two.sided',var.equal=FALSE)
+```
+
+(v) Observa p-valor;
+
+$$p-value < 2.2e-16$$
+
+(vi) Concluir
+
+Como p<0.05, rejeitamos a hipótese nula bilateral e admitimos que a *media do comprimento das pétalas da espécie setosa (1,462) é diferente da media do comprimento das pétalas da espécie virginica (5,552).

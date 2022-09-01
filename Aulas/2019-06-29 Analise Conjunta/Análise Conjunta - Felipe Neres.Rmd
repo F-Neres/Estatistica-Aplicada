@@ -1,0 +1,95 @@
+---
+title: "Análise Conjunta"
+author: "Felipe Neres S. Bezerra"
+date: "29 de junho de 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Carros esportivos
+
+## 1. Leitura dos dados
+```{r message=FALSE, warning=FALSE}
+library(mlogit)
+sportscar_long <- read.csv("sportscar_choice_long.csv")
+sportscar_long$seat<-as.factor(sportscar_long$seat)
+sportscar <- mlogit.data(sportscar_long,
+                       shape = "long", 
+                       varying = 5:8, 
+                       alt.var = "alt",
+                       choice = "choice")
+head(sportscar)
+```
+
+
+## 2. Construção do modelo
+```{r message=FALSE, warning=FALSE}
+levels(sportscar_long$seat)
+levels(sportscar_long$trans)
+levels(sportscar_long$convert)
+model <- mlogit(choice ~ 0+seat+trans+convert+price, data=sportscar)
+summary(model)
+```
+
+
+## 3. Interpretação dos coeficientes
+  Apenas o nível de 4 lugares não foi significante.
+  O carro possuir 5 lugares é uma característica positiva, se comparada com o nível de comparação: 2 lugares.
+  Carros automáticos são preferíveis a carros manuais
+  Conversíveis são preferenciais.
+  O preço foi inversamente proporcional à escolha dos respondentes.
+
+## 4. Simulação de um novo produto e ver o share previsto
+```{r message=FALSE, warning=FALSE}
+products <- data.frame(seat = factor(c(2, 5), levels=c(2,4,5)), 
+                       trans= factor(c("manual", "auto"), 
+                                     levels=c("auto", "manual")),
+                       convert=factor(c("no", "yes"), 
+                                      levels=c("no", "yes")), 
+                       price = c(35, 45), 
+                       segment=factor(c("racer", "racer"), 
+                                      levels=c("basic", "fun", "racer")))
+```
+
+```{r message=FALSE, warning=FALSE}
+products <- data.frame(seat = factor(c(2, 5), levels=c(2,4,5)), 
+                       trans= factor(c("manual", "auto"), 
+                                     levels=c("auto", "manual")),
+                       convert=factor(c("no", "yes"), 
+                                      levels=c("no", "yes")), 
+                       price = c(35, 45))
+```
+
+```{r message=FALSE, warning=FALSE}
+predict_mnl <- function(model, products) {  
+  # model: objeto mlogit criado pela funcao mlogit()  
+  # data: data frame contendo os designs q voce quer prever
+  # data deve ter mesmo formato dos dados usados para estimar o modelo mlogit
+  data.model <- model.matrix(update(model$formula, 0 ~ .), 
+                             data = products)[,-1]  
+  utility <- data.model %*% model$coefficients 
+  share <- exp(utility)/sum(exp(utility))  
+  cbind(share, products)
+}
+```
+
+```{r message=FALSE, warning=FALSE}
+predict_mnl(model, products)
+```
+  O veículo de dois lugares, manual, não conversível e de preço 35 é preferível ao de 5 lugares, automático, conversível e de preço 45.
+
+## 5. Willingness do Pay (razão entre coeficiente do fator e predcificação)
+
+ valor negativo (pois as pessoas desejam pagar MENOS) da variavel `price` 
+(Escala de $) = q eh o coeficiente 5
+```{r message=FALSE, warning=FALSE}
+coef_price <- -1*coef(model)[5]
+coef(model)/coef_price
+```
+
+  Aqui é mostrado o quanto o preço deve ser maior ou menor em comparação ao modelo nulo para que a escolha seja equiparável.
+  Veículos de 5 lugares são mais caros em comparação aos de 2 lugares, bem como os conversíveis em comparação aos não conversíveis. Os veículos de 4 lugares e de câmbio manual podem ser mais baratos.
+  

@@ -1,0 +1,20 @@
+Durbin-Watson de independência
+
+summary(lm(y~x)
+
+X: inclnação
+
+Residual vs Fited
+   A linha vermelha india a média dos erros ao longo da curva linear.
+   A média é 0 apenas em dois pontos da curva linear.
+
+Scale-Location e Q-Q Plot não serão lineares se não houver normalidade dos erros.
+
+*Procurar como se calcula Durbin-Watson
+
+	Outlier
+Resíduo
+Alavancagem
+Distância de Cook - Leva em consideração os dois anteriores
+
+Amostra-treino e amostra-teste

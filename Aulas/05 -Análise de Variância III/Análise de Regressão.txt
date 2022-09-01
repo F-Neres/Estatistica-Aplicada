@@ -1,0 +1,18 @@
+data("airquality")
+
+#Wind ~ Temp
+plot(Wind~Temp, airquality)
+Setembro <- airquality[airquality$Month==9,]
+plot(Wind~Temp, Setembro)
+mod1 <- lm(Wind~Temp, airquality)
+mod1
+abline(mod1, col="red")
+summary(mod1)
+par(mfrow=c(2,2))
+plot(mod1)
+
+
+
+       #Temp ~ Solar.R
+#Ozone ~ Wind
+#Ozone ~ Solar.R

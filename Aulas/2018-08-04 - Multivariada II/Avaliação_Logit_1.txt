@@ -1,0 +1,66 @@
+﻿#definindo variáveis como fatores ou numéricas.
+
+
+Dados.ativ <- as.dataframe(Dados_ativ_final201802)
+
+
+Dados.ativ[,"pagamento"] <- as.factor(Dados.ativ[,"pagamento"])
+
+
+Dados.ativ[,"estadocivil"] <- as.factor(Dados.ativ[,"estadocivil"])
+
+
+Dados.ativ[,"sexo"] <- as.factor(Dados.ativ[,"sexo"])
+
+
+Dados.ativ[,"idade"] <- as.numeric(Dados.ativ[,"idade"])
+
+
+summary(Dados.ativ)
+
+
+
+
+#separando observações como treinamento (60% das observações) e validação (40% das observações).
+
+
+ablation <- sort(sample(nrow(Dados.ativ), nrow(Dados.ativ)*.6))
+
+
+Dados.treino <- Dados.ativ[ablation,]
+
+
+Dados.valid <- Dados.ativ[-ablation,]
+
+
+summary(Dados.treino)
+summary(Dados.valid)
+
+
+
+
+#regressão logistica dos dados de treinamento com todas as variáveis.
+
+
+Mod.compl <- glm (pagamento ~ . , family=binomial, data=Dados.treino)
+
+
+
+
+#Processo de stepwise para seleção do modelo com maior poder explicativo (segundo critério de Akaike).
+
+
+Mod.stepwise <- step (Mod.compl, direction="both")
+
+
+summary(Mod.stepwise)
+
+
+
+
+#Razão de chances (odds ratio).
+
+
+exp(cbind (OR=coef (Mod.stepwise), confint (Mod.stepwise)))
+
+

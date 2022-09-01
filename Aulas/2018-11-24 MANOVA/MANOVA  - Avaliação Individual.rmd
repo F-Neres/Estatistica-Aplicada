@@ -1,0 +1,229 @@
+ew---
+title: "MANOVA  - AvaliaÃ§Ã£o Individual"
+author: "Felipe Neres Silva Bezerra"
+date: "7 de dezembro de 2018"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if(!require(ggplot2)){install.packages('ggplot2')}
+if(!require(dplyr)){install.packages('dplyr')}
+if(!require(tidyr)){install.packages('tidyr')}
+if(!require(mvnormtest)){install.packages('mvnormtest')}
+if(!require(mvoutlier)){install.packages('mvoutlier')}
+if(!require(biotools)){install.packages('biotools')}
+if(!require(jmv)){install.packages('jmv')}
+```
+
+    Essa avaliação tem a nota final 10,0. Não esqueça de colocar o seu nome neste relatório final (cabeçalho do arquivo). O prazo de entrega é mais longo dessa vez: 30 de janeiro de 2019. As questões estão numeradas de 1 a 10 e valem 1 ponto cada.
+
+Para essa avaliação e análises, utilizaremos os pacotes `ggplot2`, `dplyr`, `tidyr`, `mvnormtest`, `mvoutlier`, `biotools`, `car` e `jmv` 
+
+## QUESTÕES PRÁTICAS
+
+Para essa avaliação usaremos dados gerados (`dados_mancova.csv`) sobre um experimento onde foram realizados 4 diferentes tipos de tratamentos (`trata`): `Cana`, `Eucalipto`, `Soja`, `Mata_nativa`; onde os valores de uma variável química (`valor`) foram coletadas em 20 pontos (`id`) em dois tempos distintos - coluna `Tempo`: `Tempo1` e `Tempo2`.
+
+```{r}
+df <- read.csv("dados_mancova.csv")
+str(df)
+```
+
+Primeiramente, uma análise exploratória visual dos dados:
+
+```{r}
+ggplot(df, aes(x=as.numeric(profundidade),y=valor, group=trata, color=trata, shape=trata))+
+  geom_point()+geom_smooth()+scale_color_brewer(palette = "Set1")+theme_bw()+
+  facet_grid(.~Tempo)+xlab("Profundidade")+ylab("Variável do solo")
+```
+
+### 1. Por que a MANOVA (ou MANCOVA) seria um tipo de análise indicada neste caso? Explique.
+
+**R:** *Se o objetivo da análise for determinar a probabilidade de que diferenças de médias em múltiplas variáveis contínuas (Variável do solo em cada profundidade) ao longo de diversos grupos (tratamentos) não ocorrem apenas devido a erro amostral, o mais indicado é utilizar a MANOVA como método estatístico. A alterna de utilizar uma ANOVA pra cada variável dependente seria menos eficiente quando a interação entre as variáveis dependentes é relevante para a pesquisa, além de que um maior número de testes exige que o pesquisador seja mais criterioso, aceitando apenas níveis de significância menores.*
+
+Para podermos efetuar os testes, precisamos ver os pressupostos dos testes:
+
+ * Linearidade
+ * Independência
+ * Normalidade
+ * Homocedasticidade
+ * Amostragem sem outliers
+
+Para isso, colocarei as linhas de comando abaixo. Interprete-as depois nas questões em seguida:
+
+A. Transformar os dados em *wide*:
+
+```{r}
+df_wide <- spread(df, profundidade, valor) %>%
+  mutate(Tempo=as.numeric(Tempo),
+         trata=as.factor(trata))
+```
+
+* Análises Tempo 1
+- Teste 1
+
+```{r}
+df_wide %>% filter(Tempo==1)%>%
+  dplyr::select(p0,p10,p20,p30,p40,p50) %>% t() %>%
+  mvnormtest::mshapiro.test()
+```
+
+- Teste 2
+
+```{r}
+df_wide %>% filter(Tempo==1)%>%
+  with(biotools::boxM(cbind(p0,p10,p20,p30,p40,p50), trata))
+```
+
+- Teste 3
+
+```{r}
+df_wide %>% filter(Tempo==1)%>%
+  dplyr::select(p0,p10,p20,p30,p40,p50) %>%
+  mvoutlier::aq.plot() 
+```
+15 53 59
+
+* Análises Tempo 2
+- Teste 1
+
+```{r}
+df_wide %>% filter(Tempo==2)%>%
+  dplyr::select(p0,p10,p20,p30,p40,p50) %>% t() %>%
+  mvnormtest::mshapiro.test()
+```
+
+- Teste 2
+
+```{r}
+df_wide %>% filter(Tempo==2)%>%
+  with(biotools::boxM(cbind(p0,p10,p20,p30,p40,p50), trata))
+```
+
+- Teste 3
+
+```{r}
+df_wide %>% filter(Tempo==2)%>%
+  dplyr::select(p0,p10,p20,p30,p40,p50) %>%
+  mvoutlier::aq.plot() 
+```
+15 35 47 53 59
+
+* Análises para ambos os Tempos
+
+- Teste 1
+
+```{r}
+df_wide %>% 
+  dplyr::select(p0,p10,p20,p30,p40,p50) %>% t() %>%
+  mvnormtest::mshapiro.test()
+```
+
+- Teste 2
+
+```{r}
+df_wide %>% 
+  with(biotools::boxM(cbind(p0,p10,p20,p30,p40,p50), trata))
+```
+
+- Teste 3
+
+```{r}
+df_wide %>% 
+  dplyr::select(p0,p10,p20,p30,p40,p50) %>%
+  mvoutlier::aq.plot() 
+```
+
+
+### 2. Interprete as análises em relação a Linearidade e Indepêndencia. O que pode ser feito se esses pressupostos não forem alcançados? 
+
+**R:**
+*A independência dos valores aferidos para cada observação é algo determinado no âmbito da coleta dos dados ou de forma conceitual, de acordo com o escopo da pesquisa. As causas mais comuns de violação deste pressuposto são o tempo - quando o momento da coleta dos dados é relevante o bastante para causar alterações nos dados - e o espaço - quando o ambiente de algum modo influencia nos dados aferidos mas não é devidamente considerado. Para ambas as situações, o recomendado é considerar estas características como covariáveis ou fatores de blocagem no teste; ou, em último caso, recorrer a um nível mais crítico de significância (alfa inferior a 0,01). Na amostra utilizada, nota-se um agrupamento de observações que são acusados como outliers no teste 3, mas que podem ser indício de agrupamento não previsto pelo tratamento proposto. Em relação à questão temporal, separar a amostra em Tempo 1 e Tempo 2 denota preocupação do pesquisador com este efeito sobre a independência dos dados. Levando em consideração que as Identificações (Id) das observações se repetem não só para cada tempo, mas também para cada grupo, é de se supor que haja alguma dependência também neste sentido (várias respostas de um mesmo indivíduo), tornando necessário averiguar o que a teoria afirma acerca do assunto.*
+*A linearidade poderia ser verificada observando a matriz de correlações entre as variáveis dependentes, ou através do teste de esfericidade de Bartlett, que examina de forma coletiva se há inter-correlação entre as variáveis dependentes. Quando o pressuposto de linearidade não é atendido, pode-se tentar transformar os valores (polinomial, exponencial, logarítmica). Também é possível aceitar as variáveis não-lineares, em busca de maior representatividade em detrimento de assertividade.*
+
+
+### 3. Interprete as análises em relação a normalidade e homocedasticidade. 
+
+**R:** *Seja observando a amostra separada pelo tempo ou de forma conjunta, rejeita-se a hipótese de que todas as variáveis são normais multivariadas (ou seja, de que o efeito conjunto das variáveis dependentes é distribuído normalmente). Violações desta suposição criam problemas na aplicação do teste M de Box, mas têm pouco impacto sobre amostras maiores. Considerando as amostras do Tempo 1 e do Tempo 2 separadamente, é possível afirmar, segundo os resultados dos testes M de Box, que as matrizes de variância-covariância das medidas dependentes para cada grupo são iguais; diferente do que ocorre com a amostra com ambos os tempos.*
+
+
+### 4. Interprete as análises em relação a presença de outliers. Qual é a sugestão em relação aos dados?
+
+**R:** *O grande número de observações que o teste 3 aponta como outliers sugere que algum tipo de agrupamento não previsto pelo tratamento pode estar afetando os valores dessas observações. É recomendado que se avalie se algum fator de blocagem ou covariável importante deveria ser levada em consideração, além de revisar os dados a fim de se certificar de que as informações foram coletadas corretamente.*
+
+Faça as análises usando a função `mancova` do pacote `jmv`.
+
+ * Teste A
+
+```{r}
+mancova(data = df_wide[df_wide$Tempo==1,],
+        deps = c('p0', 'p10', 'p20', 'p30', 'p40','p50'),
+        factors = 'trata',
+        boxM = FALSE, shapiro = FALSE, qqPlot = TRUE)
+```
+
+  * Teste B
+
+```{r}
+mancova(data = df_wide[df_wide$Tempo==2,],
+        deps = c('p0', 'p10', 'p20', 'p30', 'p40','p50'),
+        factors = 'trata',
+        boxM = FALSE, shapiro = FALSE, qqPlot = TRUE)
+```
+
+  * Teste C
+
+```{r}
+mancova(data = df_wide,
+        deps = c('p0', 'p10', 'p20', 'p30', 'p40','p50'),
+        factors = 'trata',
+        covs='Tempo',
+        boxM = FALSE, shapiro = FALSE, qqPlot = TRUE)
+```
+
+
+### 5. Faça a interpretação do teste A. Existe alguma violação nos pressupostos?
+
+**R:** *Segundo as quatro medidas estatísticas aplicadas, há diferença significante da média da variável estatística de ao menos dois grupos. Para um exame mais detalhado sobre quais grupos se diferem, faz-se necessário testes post hoc ou a priori. De forma individual, todas as variáveis dependentes também demonstram diferença significante de ao menos dois grupos.*
+*Como visto no Teste 2 para o Tempo 1, o pressuposto de normalidade não foi atendido. Porém, considerando que seu maior impacto é sobre o teste M de Box para Homocedasticidade, que não foi significativo, e que o gráfico quantil-quantil apresenta uma disposição razoavelmente linear, o pressuposto de normalidade pode não ser considerado um problema.*
+
+### 6. Faça a interpretação do teste B. Existe alguma violação nos pressupostos?
+
+**R:** *Segundo as quatro medidas estatísticas aplicadas, há diferença significante da média da variável estatística de ao menos dois grupos. Para um exame mais detalhado sobre quais grupos se diferem, faz-se necessário testes post hoc ou a priori. De forma individual, todas as variáveis dependentes também demonstram diferença significante de ao menos dois grupos.*
+*Como visto no Teste 2 para o Tempo 2, o pressuposto de normalidade não foi atendido. Porém, considerando que seu maior impacto é sobre o teste M de Box para Homocedasticidade, que não foi significativo, e que o gráfico quantil-quantil apresenta uma disposição razoavelmente linear, o pressuposto de normalidade pode não ser considerado um problema.*
+
+### 7. Faça a interpretação do teste C. Existe alguma violação nos pressupostos?
+
+**R:** *Segundo as quatro medidas estatísticas aplicadas, há diferença significante da média da variável estatística de ao menos dois grupos. Para um exame mais detalhado sobre quais grupos se diferem, faz-se necessário testes post hoc ou a priori. De forma individual, todas as variáveis dependentes também demonstram diferença significante de ao menos dois grupos.*
+*Quanto à covariável Tempo, esta também foi significante em relação tanto à variável estatística quanto às variáveis dependentes individualmente. Todavia, Para comparar a efetividade da inclusão da covariável Tempo, seria necessário efetuar um teste MANCOVA com todas as observações de ambos os tempos, mas sem considerar o Tempo como uma covariável, para então, por comparação, avaliar se a inclusão da covariável é justificável. *
+*Ainda que a variável Tempo seja incluída como covariável, o pressuposto de independência não é atendido, pois ocorre diferença temporal entre observações de um mesmo indivíduo.*
+*Diferente do ocorrido com as partes da amostra separadas pelo Tempo, a junção em uma única amostra não só fere o pressuposto de normalidade como de homocedasticidade. Felizmente, uma violação dessa suposição tem impacto mínimo já que os grupos têm exatamente o mesmo tamanho, ao passo que o pesquisador ainda tem como recurso reduzir o valor de alfa para compensar essa falha.*
+
+## QUESTÕES TÉORICAS
+
+### 8. Quais as diferenças entre MANOVA e análise discriminante? Quais situações são mais adequadas a cada técnica multivariada?
+
+**R:**
+ *Na análise discriminante, os grupos são previamente assumidos como diferentes, e as funções discriminantes são determinadas de modo a explicitar essa diferença. Com a MANOVA não há a prerrogativa de que os grupos são diferentes; pelo contrário, o objetivo é averiguar se os grupos são de fato diferentes segundo as variáveis depenentes (mais especificamente, se as diferenças entre os grupos é significante).*
+*Como os testes com MANOVA permitem que se utilize mais de um tratamento (diferentemente do que ocorre com a análise discriminante, que comporta apenas uma variável categórica), o pesquisador ainda seria capaz de não somente determinar se a variável estatística difere significativamente ao longo dos grupos que combinam os tratamentos, mas também avaliar quais características dos grupos se relacionam a tais diferenças.*
+
+### 9. Como o poder estatístico é afetado por decisões de delineamento estatístico e de pesquisa? Como você planejaria um estudo para garantir um poder adequado?
+
+**R:** 
+*O pesquisador deve planejar a pesquisa de modo que a probabilidade de erro tipo II seja menor ou igual a 0,2.*
+*De forma geral, quanto maior a amostra de cada grupo, menor o erro amostral e maior o poder estatístico. Porém, tem-se que o aumento do tamanho amostral deixa de ser relevante ao poder estatístico quando o grupo ampliado já atingiu 150 observações.*
+*Quanto mais criterioso foi o pesquisador, exigindo p-valores menores, menor a chance de se aceitar um falso-positivo, mas também reduz a probabilidade de que um teste identifique um efeito do tratamento se ele realmente existir. Este deve ser um recurso a se considerar quando não for possível alcançar um mínimo de 30 observações por grupo (aceitando como significante p-valor, por exemplo, de 0,1).*
+*O tamanho do efeito, que é uma medida expressa como a diferença em médias dos grupos em relação ao seu desvio padrão, não pode ser controlado pelo pesquisador, principalmente em pesquisas de campo, uma vez que este utiliza o que é dado pelo ambiente do qual os dados são coletados. Entretanto, é sempre possível verificar se há como adicionar fatores de blocagem e covariáveis, o que pode acentuar o tamanho do efeito.*
+*Por fim, altas correlações entre as variáveis dependentes, principalmente se a correlação for negativa em casos que ambas as variáveis do par correlacionado demonstrarem enorme tamanho de efeito (ou se ambas tiverem tamanho de efeito ínfimo), contribuem de forma relevante para o pode estatístico. Assim, como acrescentar variáveis dependentes, ainda que redundantes, resulta em ganho de poder estatístico, o pesquisador deve estar atento para não violar o pressuposto da multicolinearidade.*
+
+### 10. Descreva algumas situações de análise de dados nas quais MANOVA e MANCOVA seriam adequadas em suas áreas de interesse. Descreva os tipos de variáveis ou covariáveis e como elas poderiam estar operando na análise como variáveis e covariáveis?
+
+**R:** 
+*As pesquisa da área econômica que mais facilmente pode-se encontrar variáveis categóricas, que formem grupos que podem ser comparados através de medidas quantitativas são as que possuem finalidade de avaliação de opinião ou com intuito socioeconômico.*
+*Tomando como exemplo uma pesquisa socioeconômica, as variáveis independentes podem separar os respondentes em divisões geográficas dentro de um território (regiões, estados ou municípios dentro de um país, de uma região ou de um estado).*
+*As variáveis dependentes poderiam ser fundamentadas nos conceitos de desenvolvimento humano, tais como renda familiar, escolaridade (dada em anos de estudo), horas semanais disponíveis para o lazer e nível de segurança, saneamento e sistema de saúde (estes últimos dados em escore pelo respondente).*
+*Tais variáveis dependentes poderiam não ser explicadas somente pela diferenciação regional, mas por sexo e zona de residência (urbana ou rural), inseridas como fatores de blocagem, e idade incluída como covariável.*
+
+

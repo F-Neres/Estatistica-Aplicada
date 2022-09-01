@@ -1,0 +1,93 @@
+Se F for  significativo (abaixo de 0,05%), o valor de F foi alto de mais.
+Quanto menor a significância, menor a chance de que, rejeitando a hipótese nula (de que
+
+ANOVA
+   Se uma das categorias não for qualitativa, haverá uma ANCOVA
+
+Usar Qui-quadrado para saber se os números de amostras nos grupos estão balanceados.
+
+plot(anova_a,which=1)
+   "which": escolhe o gráfico a ser mostrado.
+
+E se os resíduos não seguirem uma distribuição normais?
+
+--------------------------------------------------------------------------------------------------
+
+ANOVA One Way
+1. Ler dados
+setwd(choose.dir())
+
+2. Balanceamento
+table(dados_Hair_etal$size)
+chisq.test(table(dados_Hair_etal$size))
+#Houve significância (frequências são diferentes e os dados estão desbalanceados)
+#Selecionar, aleatoriamente, 40 dos 60 itens em "small".
+
+3. Distribuição normal
+tapply(X=dados_Hair_etal$use, INDEX=dados_Hair_etal$size, FUN=shapiro.test)
+
+4. Homocedasticidade
+tapply(X=dados_Hair_etal$use, INDEX=dados_Hair_etal$size, FUN=var)
+bartlett.test(use~size,dados_Hair_etal)
+
+5. ANOVA
+Res.anova<-aov(use~size,dados_Hair_etal)
+summary(Res.anova)
+#
+
+6. Resíduos
+shapiro.test(residuals(Res.anova)) #Deve seguir dist. norma.
+mean(residuals(Res.anova)) #Média deve ser próxima de zero.
+plot(Res.anova, which=1)
+plot(Res.anova, which=2)
+plot(Res.anova, which=3)
+plot(Res.anova, which=4)
+
+7. Conclua. Post hoc?
+#ANOVA foi significativa - as médias são diferentes.
+#É possível fazer post hoc.
+#Havendo apenas dois grupos, este teste é dispensável.
+
+8. Post hoc
+TukeyHSD(Res.anova)
+
+9. Conclua
+#Os grupos "small" e "large" são diferentes.
+
+10. Visualizar
+boxplot(use~size,dados_Hair_etal)
+
+	ANOVA two ways
+1. Leitura de dados
+#Balanceamento, normalidade e homocedasticidade devem adicionar os feitos anteriormente, caso não tivessem sido feitos.
+
+2. Balanceamento
+table(dados_Hair_etal$type,dados_Hair_etal$size)
+chisq.test(table(dados_Hair_etal$type,dados_Hair_etal$size))
+
+3. Normalidade
+tapply(X=dados_Hair_etal$use,INDEX=dados_Hair_etal$type,shapiro.test)
+
+4. Homocedasticidade
+tapply(X=dados_Hair_etal$use,INDEX=dados_Hair_etal$type,var)
+bartlett.test(use~type,dados_Hair_etal)
+
+5. ANOVA
+res.anova<-aov(use~type*size,dados_Hair_etal)
+summary(res.anova)
+
+6. Resíduos
+plot(res.anova,which=1)
+plot(res.anova,which=2)
+plot(res.anova,which=3)
+plot(res.anova,which=4)
+shapiro.test(residuals(res.anova))
+
+7. Conclusão da ANOVA
+#Aponta significativo apenas para 'Size'.
+
+8. Post hoc.
+TukeyHSD(res.anova)
+
+dados_Hair_etal
+tabela: 'table(dados_Hair_etal$type,dados_Hair_etal$size)'

@@ -1,0 +1,116 @@
+---
+title: "Validacao de Constructo - Avaliação"
+author: "Liziane, Felipe, Leandro Sampaio, Patricia"
+date: "6 de julho de 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if(!require(irr)){install.packages('irr')}
+if(!require(psych)){install.packages('psych')}
+if(!require(dplyr)){install.packages('dplyr')}
+if(!require(psychometric)){install.packages('psychometric')}
+if(!require(semTools)){install.packages('semTools')}
+if(!require(semPlot)){install.packages('semPlot')}
+if(!require(purrr)){install.packages('purrr')}
+```
+
+# Confiabilidade
+
+## 1. Equivalencia
+
+### A. Inter-rater
+
+```{r}
+setwd("E:/Validação de Constructo")
+```
+
+
+```{r}
+dados <-read.csv('satisfacao.csv', sep=';', dec=',') 
+
+# Matriz de Correlacao das notas dos experts
+cor(dados)
+
+# Porcentagem de concordancia dos experts
+irr::agree(dados)
+```
+
+**R. A porcentagem de concordância foi zero, ou seja, não há respostas iguais entre os entrevistados.**
+
+```{r message=FALSE, warning=TRUE, paged.print=FALSE}
+# checar confiabilidade inter-rater 
+psych::cohen.kappa(dados)
+```
+
+## 2. Consistencia interna
+
+### A. Content Validity Ratio --> Validade do Conteudo
+
+### B. Coeficiente Alfa
+
+Vendo o alfa de todas as variaveis (sem distincao)
+
+```{r}
+psych::alpha(dados)$total$std.alpha
+```
+**R. o valor de alfa para todas as variáveis foi de 0,87,o que significa boa confiabilidade de que as variáveis mensuráveis estão relacionadas com seus respectivos constructos.**
+
+##Criando novos data.frames para cada um dos fatores:
+
+###Estrutura:
+
+```{r}
+estrutura <- dplyr::select(dados, c(Recurso, Predial, ADM))
+psych::alpha(estrutura)$total$std.alpha
+```
+
+Conhecimento:
+
+```{r}
+conhecimento <- dplyr::select(dados, c(Assimilado,Dominio.prof, Grade, Avaliacao))
+psych::alpha(conhecimento)$total$std.alpha
+```
+
+Comodidade:
+
+```{r}
+comodidade <- dplyr::select(dados, c(Acesso, Horario, Periodicidade))
+psych::alpha(comodidade)$total$std.alpha
+```
+
+**R. O fator conhecimento apresentou alfa de 0,27, o que é inadimissivel. Dessa forma, avaliando a matriz de correlação, as variáveis Assimilado e Grade do fator conhecimento são as únicas com correlação alta.**
+
+Conhecimento:
+
+```{r}
+conhecimento2 <- dplyr::select(dados, c(Assimilado, Grade))
+psych::alpha(conhecimento2)$total$std.alpha
+```
+**R. Retirando as duas variáveis Dominio.prof e Avaliacao o resultado do alfa foi de 0,9, muito bom.**
+
+# Validade
+
+## 2. Constructo
+
+### A. Validade Convergente e Validade Discriminante
+
+```{r}
+
+Satisfacao_cfa_model<-"ESTRUTURA =~ Recurso+Predial+ADM
+CONHECIMENTO =~Assimilado+Grade
+COMODIDADE =~ Horario+Acesso"
+
+Satisfacao_CFA<-lavaan::cfa(model=Satisfacao_cfa_model, data=dados)
+
+# Summarize results with fit measures and standardized estimates
+summary(Satisfacao_CFA, fit.measures=T, standardized=T)
+```
+**R. O fator Comodidade não apresentou significancia com o modelo construído na ordem Avaliacao + Acesso + Horario, invertendo a ordem Horario + Acesso + Avaliacao o modelo melhorou e a Avaliacao ficou não significativa. Dessa forma ela foi retirada do modelo.O modelo ainda não ficou perfeito devido a limitação do número de n, porém foi esse o melhor resultado.**
+
+```{r}
+# Construct validity
+semTools::reliability(Satisfacao_CFA)
+```
+**R. O  valor de omega3 do fator estrutura ficou diferente do primeiro e segundo, porém ...**

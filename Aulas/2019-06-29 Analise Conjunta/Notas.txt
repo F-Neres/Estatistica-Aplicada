@@ -1,0 +1,25 @@
+Cada fator (variável) tem um número de níveis (opções).
+Cada combinação de níveis é um estímulo.
+Os estímulos são ordenados pelo respondente.
+As respostas podem ser por ordem de preferência (um ranking para cada respondente), ou cada respondente dá um "ponto" para um estímulo.
+Cada nível de cada fator terá uma pontuação, somando suas posições.
+Com a pontuação (ordenação) haverá um desvio a partir da média de todo o ranking.
+Soma-se os desvios ao quadrado e soma-se todos os respondentes.
+
+vnijs.shinyapps.io/radiant
+
+CA - Tradicional
+ACA - Adaptativa
+CBCA - Baseada em escolhas
+
+A matriz dispõe cada observação por respondente e cada variável como um dos estímulos possíveis.
+
+
+
+Utilidade Maxima
+BTL(Bradley-Terry-Luce)
+Modelos logit
+
+CBCA
+Valores positivos de estimativa indicam maior utilidade de determinado nível de característica.
+Ser significante indica que a estimativa impacta de forma relevante na preferência dos respondentes.
