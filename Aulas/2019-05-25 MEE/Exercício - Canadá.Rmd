@@ -1,5 +1,5 @@
 ---
-title: "Exercício 7"
+title: "Exercï¿½cio 7"
 output: pdf_document
 ---
 
@@ -7,9 +7,9 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Os dados-canada.csv referem-se ao questionário para o Estudo de Eleição Nacional Canadense de 1997 e são destinados a estudar a influência da atitude em relação aos valores tradicionais. O conjunto contém 1529 observações e seguintes quatro variáveis
+Os dados-canada.csv referem-se ao questionï¿½rio para o Estudo de Eleiï¿½ï¿½o Nacional Canadense de 1997 e sï¿½o destinados a estudar a influï¿½ncia da atitude em relaï¿½ï¿½o aos valores tradicionais. O conjunto contï¿½m 1529 observaï¿½ï¿½es e seguintes quatro variï¿½veis
 
-MBSA2: fator ordenado com níveis "Discordo totalmente", "Discordo", "Concordo" e "Concordo totalmente" para a questão "Nós deveríamos ser totalmente tolerantes com as pessoas que escolhem viver de acordo com seus próprios padrões, mesmo se eles forem muito diferentes"
+MBSA2: fator ordenado com nï¿½veis "Discordo totalmente", "Discordo", "Concordo" e "Concordo totalmente" para a questï¿½o "Nï¿½s deverï¿½amos ser totalmente tolerantes com as pessoas que escolhem viver de acordo com seus prï¿½prios padrï¿½es, mesmo se eles forem muito diferentes"
 
 
 Carregando pacote
@@ -23,30 +23,30 @@ View(dados_canada)
 ```
 
 
-a) Expresse o modelo em termos de equações
+a) Expresse o modelo em termos de equaï¿½ï¿½es
 
 ```{r}
 mdlCanada <- 'opinion =~ MBSA2.2 + MBSA7.2 + MBSA8.2 + MBSA9.2'
 ```
 
 
-b) defina se o modelo é identificável
+b) defina se o modelo ï¿½ identificï¿½vel
 
-Identificação do modelo
+Identificaï¿½ï¿½o do modelo
 q = 8
 p = 4
 p(p+1)/2 = 4*5/2 = 10
-Identificável
+Identificï¿½vel
 
 
-c) Utilizando o método de Máxima Verossimilhança, estime o modelo e comente.
+c) Utilizando o mï¿½todo de Mï¿½xima Verossimilhanï¿½a, estime o modelo e comente.
 
 ```{r}
 modfit7 <- sem(mdlCanada, data = dados_canada, std.lv = TRUE)
 summary(modfit7)
 ```
 MBSA2 e MBSA8 influenciam positivamente o fator criado, enquanto que MBSA7 e MBSA9 influenciam negativamente.
-O fator representa o nível de liberalismo na opinião do respondente.
+O fator representa o nï¿½vel de liberalismo na opiniï¿½o do respondente.
 
 
 d) Analise a qualidade do ajuste.
@@ -54,11 +54,11 @@ d) Analise a qualidade do ajuste.
 ```{r}
 summary(modfit7, fit.measures = TRUE)
 ```
-Qui-quadrado = 0; a diferença entre as matrizes não é zero e o modelo não é ajustado.
+Qui-quadrado = 0; a diferenï¿½a entre as matrizes nï¿½o ï¿½ zero e o modelo nï¿½o ï¿½ ajustado.
 CFI = 0.973; bom se acima de 0.8
 TLI = 0.920; bom se acima de 0.8
 RMSEA = 0.079 / p-valor = 0.048; bom se abaixo de 0.05
-SRMR = 0.029; bom (resíduos pequenos) se abaixo de 0.08
+SRMR = 0.029; bom (resï¿½duos pequenos) se abaixo de 0.08
 
 
 ```{r}
