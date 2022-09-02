@@ -5,7 +5,8 @@ date: "4 de julho de 2019"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```
+{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 if(!require(irr)){install.packages('irr')}
 if(!require(psych)){install.packages('psych')}

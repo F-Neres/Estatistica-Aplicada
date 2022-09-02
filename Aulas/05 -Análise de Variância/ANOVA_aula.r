@@ -48,22 +48,22 @@ var.test(valor ~ plantacao, dados)
 
 ###
 
-#1ª forma: lm->aov->summary
+#1ï¿½ forma: lm->aov->summary
 mod<-lm(valor ~ plantacao, dados)
 mod
 anova_mod<-aov(valor ~ plantacao, dados)
 anova_mod
 summary(anova_mod)
 
-#2ª forma: lm->anova
+#2ï¿½ forma: lm->anova
 mod<-lm(valor ~ plantacao, dados)
 anova(mod)
 
-#3ª forma: aov->summary
+#3ï¿½ forma: aov->summary
 anova_dir<-aov(valor ~ plantacao, dados)
 summary(anova_dir)
 
-#resíduos
+#resï¿½duos
 residuos<-residuals(anova_mod)
 sum(residuos)
 sum(residuos^2) # SSDw (dentro dos grupos)
@@ -114,7 +114,7 @@ summary(ANOVA_LM_mod)
 ## Com interacao entre fatores:
 ANOVA_int <- aov(len ~ factor(dose) + supp + factor(dose):supp, data= dente)
 summary(ANOVA_int)
-# É a mesma coisa que:
+# ï¿½ a mesma coisa que:
 ANOVA_int <- aov(len ~ factor(dose)*supp, data= dente)
 summary(ANOVA_int)
 
@@ -130,7 +130,7 @@ marginal$contrasts
 TukeyHSD(ANOVA_int)
 
 cld(marginal,
-    alpha=0.05,           ### Nivel de significancia da diferença dos grupos
+    alpha=0.05,           ### Nivel de significancia da diferenï¿½a dos grupos
     Letters=letters,      ### Usa letras caixa baixa para cada grupo
     adjust="tukey")       ### Comparacao ajustada de Tukey
 
@@ -145,7 +145,7 @@ ggplot(dente, aes(y=len, x=factor(dose), fill=supp))+
                2.8, 3.2),
            y=max(dente$len)+1)
 
-## ANálise de COVAriância: Resposta ~ Fator*VarContinua
+## ANï¿½lise de COVAriï¿½ncia: Resposta ~ Fator*VarContinua
 ANCOVA_ <- aov(len ~ dose*supp, data= dente)
 summary(ANCOVA_)
 
@@ -166,7 +166,7 @@ minha_anova <- aov(len ~ supp * factor(dose), data = meus_dentes)
 Anova(minha_anova, type = "III")
 Anova(minha_anova, type = "II")
 
-## Exercício com CO2
+## Exercï¿½cio com CO2
 data("CO2")
 
 
@@ -206,17 +206,17 @@ AnovaMR <- car::Anova(modelo,
 summary(AnovaMR, multivariate = FALSE, 
         univariate = TRUE)
 
-#Exercícios IRIS
+#Exercï¿½cios IRIS
 data(iris)
-#   Hipótese nula: médias dos comprimento das pétalas
+#   Hipï¿½tese nula: mï¿½dias dos comprimento das pï¿½talas
 #  Petal.Lenght ~ Species, data=iris
 
-#1. Distribuição normal
-shapiro.test(iris$Petal.Length) #não é normal
+#1. Distribuiï¿½ï¿½o normal
+shapiro.test(iris$Petal.Length) #nï¿½o ï¿½ normal
 shapiro.test(iris$Petal.Length[iris$Species=="setosa"])
 shapiro.test(iris$Petal.Length[iris$Species=="versicolor"])
 shapiro.test(iris$Petal.Length[iris$Species=="virginica"])
-tapply(iris$Petal.Length, iris$Species, shapiro.test) #une os três anteriores
+tapply(iris$Petal.Length, iris$Species, shapiro.test) #une os trï¿½s anteriores
 tapply(
   X = iris$Petal.Length,
   INDEX = iris$Species,
@@ -229,7 +229,7 @@ tapply(iris$Petal.Length, iris$Species, var)
 #3. Balanceamento (n)
 table(iris$Species)
 
-#4. Independência -> Teórico
+#4. Independï¿½ncia -> Teï¿½rico
 
 #5. ANOVA
 anova_iris <- aov(Petal.Length~Species,data=iris)
@@ -240,12 +240,12 @@ summary(anova_iris)
 TukeyHSD(anova_iris)
 plot(TukeyHSD(anova_iris))
 
-#7. Avaliação de resúduos (demonstração da homocedastidade)
+#7. Avaliaï¿½ï¿½o de resï¿½duos (demonstraï¿½ï¿½o da homocedastidade)
 plot(anova_iris,which=1) #erro within
 plot(anova_iris,which=2) #erro betwin
 
 ########################
-#EXERCÍCIO ANOVA 2 WAYS#
+#EXERCï¿½CIO ANOVA 2 WAYS#
 ########  CO2   ########
 ########################
 
@@ -279,7 +279,7 @@ summary(anova_co2)
 #Post hoc, se a ANOVA for significativa
 TukeyHSD(anova_co2)
 
-#ANCOVA consisiderando concentração
+#ANCOVA consisiderando concentraï¿½ï¿½o
 data("CO2")
 CO2
 

@@ -1,5 +1,5 @@
 ---
-title: "Avaliação - Inferência III"
+title: "Avaliaï¿½ï¿½o - Inferï¿½ncia III"
 author: "SEU NOME AQUI"
 date: "12 de Maio de 2018"
 output: 
@@ -11,17 +11,17 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-    Antes de começar a avaliação, perceba que ela está dividida em dois tópicos principais: "ANOVA" e "Coeficiente de correlação".
-    Para a parte de "ANOVA", ela é divida em 8 tópicos (numeradas de 1 a 8), sendo que existem perguntas para serem respondidas nos tópicos: 2 a 8. Existem caixas com linhas de comando em R que devem ser alteradas e analisadas nos tópicos: 3 a 6. 
-    Na parte de "Coeficientes de correlação" existem 4 tópicos (numeradas de 1 a 4), onde o tópico está subdividida em sub-itens A e B. Existem perguntas a serem respondidas nos tópicos: 2 a 4, com linhas de comando em R que devem ser alteradas e analisadas nos tópicos: 2B e 3. 
-    Não se esqueça de colocar o seu nome no cabeçalho desse arquivo. Esse arquivo pode ser enviado ao meu email até a próxima aula do próximo módulo.
+    Antes de comeï¿½ar a avaliaï¿½ï¿½o, perceba que ela estï¿½ dividida em dois tï¿½picos principais: "ANOVA" e "Coeficiente de correlaï¿½ï¿½o".
+    Para a parte de "ANOVA", ela ï¿½ divida em 8 tï¿½picos (numeradas de 1 a 8), sendo que existem perguntas para serem respondidas nos tï¿½picos: 2 a 8. Existem caixas com linhas de comando em R que devem ser alteradas e analisadas nos tï¿½picos: 3 a 6. 
+    Na parte de "Coeficientes de correlaï¿½ï¿½o" existem 4 tï¿½picos (numeradas de 1 a 4), onde o tï¿½pico estï¿½ subdividida em sub-itens A e B. Existem perguntas a serem respondidas nos tï¿½picos: 2 a 4, com linhas de comando em R que devem ser alteradas e analisadas nos tï¿½picos: 2B e 3. 
+    Nï¿½o se esqueï¿½a de colocar o seu nome no cabeï¿½alho desse arquivo. Esse arquivo pode ser enviado ao meu email atï¿½ a prï¿½xima aula do prï¿½ximo mï¿½dulo.
     Boa Prova!
 
 
 # ANOVA:
 
 ## 1. Os dados
-Utilize o arquivo `npk` do pacote `datasets`. Para issso, instale o pacote (`install.packages()`) e o ative com a função `require()`. Posteriormente requisite os dados de `npk` usando a função 'data()'. Também foram realizadas alterações para que as variáveis ficassem mais fáceis de serem entedidas com a função `ifelse()` **Todos esses passos já estão feitos**. 
+Utilize o arquivo `npk` do pacote `datasets`. Para issso, instale o pacote (`install.packages()`) e o ative com a funï¿½ï¿½o `require()`. Posteriormente requisite os dados de `npk` usando a funï¿½ï¿½o 'data()'. Tambï¿½m foram realizadas alteraï¿½ï¿½es para que as variï¿½veis ficassem mais fï¿½ceis de serem entedidas com a funï¿½ï¿½o `ifelse()` **Todos esses passos jï¿½ estï¿½o feitos**. 
 
 ```{r}
 if(!require(datasets)){install.packages("datasets")}
@@ -31,37 +31,37 @@ npk$P<-as.factor(ifelse(npk$P==1, "com_P", "sem_P"))
 ```
 
 Entenda os dados:
-`npk` é uma tabela no formato `data.frame` com 24 linhas and 5 colunas:
+`npk` ï¿½ uma tabela no formato `data.frame` com 24 linhas and 5 colunas:
 
 1. "block"
-Blocos dos experimentos (rotulados de 1 a 6). Dado numérico discreto.
+Blocos dos experimentos (rotulados de 1 a 6). Dado numï¿½rico discreto.
 
 2. "N"
-Indicando se houve (1) ou não houve (0) aplicação de Nitrogênio. Dado numérico binomial (duas categorias)
+Indicando se houve (1) ou nï¿½o houve (0) aplicaï¿½ï¿½o de Nitrogï¿½nio. Dado numï¿½rico binomial (duas categorias)
 
 3. "P"
-Indicando se houve (1) ou não houve (0) aplicação de Fósforo (fosfato). Dado numérico binomial (duas categorias).
+Indicando se houve (1) ou nï¿½o houve (0) aplicaï¿½ï¿½o de Fï¿½sforo (fosfato). Dado numï¿½rico binomial (duas categorias).
 
 4. "K"
-Indicando se houve (1) ou não houve (0) aplicação de Potássio. Dado numérico binomial (duas categorias)
+Indicando se houve (1) ou nï¿½o houve (0) aplicaï¿½ï¿½o de Potï¿½ssio. Dado numï¿½rico binomial (duas categorias)
 
 5. "yield"
-Produção (ou produtividade, que em inglês é *Yield*) de ervilhas, em libras (cerca de 500g) por parcela (cada parcela tinha 1/70 de 1 acre, equivalente a mais ou menos 58 m²).
+Produï¿½ï¿½o (ou produtividade, que em inglï¿½s ï¿½ *Yield*) de ervilhas, em libras (cerca de 500g) por parcela (cada parcela tinha 1/70 de 1 acre, equivalente a mais ou menos 58 mï¿½).
 
 
 ## 2. Balanceamento
-Analise o balanceamento da amostragem para o fator `N` usando a função `table()`. Para `N` a linha de comando já está feita:
+Analise o balanceamento da amostragem para o fator `N` usando a funï¿½ï¿½o `table()`. Para `N` a linha de comando jï¿½ estï¿½ feita:
 
 ```{r}
 table(npk$N)
 ```
-Faça o mesmo para o fator `P`:
+Faï¿½a o mesmo para o fator `P`:
 
 ```{r}
 table(npk$P)
 ```
 
-Agora, veja se a interação se encontra balanceada. **Essa linha de comando já está feita**.
+Agora, veja se a interaï¿½ï¿½o se encontra balanceada. **Essa linha de comando jï¿½ estï¿½ feita**.
 
 ```{r}
 table(npk$N, npk$P)
@@ -71,9 +71,9 @@ Os grupos se encontram balanceados?
 
 **R:** *Escreva a sua resposta aqui*
 
-## 3. Distribuição Normal
-Verifique se os dados `yield` seguem a distribuição normal entre as categorias de `group`. 
-Para isso, utilize a função `tapply()`, onde os valores dos parâmetros `X` e `INDEX` devem ser iguais a `weight` e `group` respectivamente, explicitando a função `shapiro.test` para o parâmetro `FUN`. **Para isso, substitua os hífens --- na caixa a seguir:**
+## 3. Distribuiï¿½ï¿½o Normal
+Verifique se os dados `yield` seguem a distribuiï¿½ï¿½o normal entre as categorias de `group`. 
+Para isso, utilize a funï¿½ï¿½o `tapply()`, onde os valores dos parï¿½metros `X` e `INDEX` devem ser iguais a `weight` e `group` respectivamente, explicitando a funï¿½ï¿½o `shapiro.test` para o parï¿½metro `FUN`. **Para isso, substitua os hï¿½fens --- na caixa a seguir:**
 
 Para `N`:
 
@@ -90,13 +90,13 @@ tapply(X = npk$---,
        FUN = shapiro.test)
 ```
 
-Os dados de `yield` seguem uma distribuição normal entre os grupos de Fertilizantes `P` e `N`? 
+Os dados de `yield` seguem uma distribuiï¿½ï¿½o normal entre os grupos de Fertilizantes `P` e `N`? 
 
 **R:** *Escreva a sua resposta aqui*
 
 
 ## 4. Homocedasticidade
-Verifique a homocedasticidade da variável `group` em relação ao fator `yield` usando a função `bartlett.test()` usando a formula dentro da função `y~x`, sendo que y = `yield` e x = presença/ausência de fertilizante (`N` e `P`). **Substitua corretamente** `x` **e** `y` **na linha de comando a seguir:**
+Verifique a homocedasticidade da variï¿½vel `group` em relaï¿½ï¿½o ao fator `yield` usando a funï¿½ï¿½o `bartlett.test()` usando a formula dentro da funï¿½ï¿½o `y~x`, sendo que y = `yield` e x = presenï¿½a/ausï¿½ncia de fertilizante (`N` e `P`). **Substitua corretamente** `x` **e** `y` **na linha de comando a seguir:**
 
 
 Para `N`:
@@ -112,38 +112,38 @@ bartlett.test(y ~ x, data = npk)
 ```
 
 
-Os dados são homocedásticos? Para os dois fatores (`N` e `P`)?
+Os dados sï¿½o homocedï¿½sticos? Para os dois fatores (`N` e `P`)?
 
 **R:** *Escreva a sua resposta aqui*
 
 
 ## 5. ANOVA two-way
-Execute ANOVA *two way*, usando as variáveis `yield` ~ `N + P + N:P`. Utilize corretamente os comandos para que o *output* seja o quadro resumo da ANOVA com dois fatores (*two way*) e com interação:
+Execute ANOVA *two way*, usando as variï¿½veis `yield` ~ `N + P + N:P`. Utilize corretamente os comandos para que o *output* seja o quadro resumo da ANOVA com dois fatores (*two way*) e com interaï¿½ï¿½o:
 
 ```{r}
 # Colocar comandos aqui:
 
 ```
 
-É válido continuarmos avaliando o modelo como uma ANOVA *two way* com interação? Ou é melhor avaliarmos o modelo sem a interação (como modelo aditivo)? Ou seria melhor desconsiderar essa análise como uma ANOVA *two way* e usar somente como uma ANOVA *one way* para somente um dos fatores (`N` ou `P`)? Justifique a sua resposta.
+ï¿½ vï¿½lido continuarmos avaliando o modelo como uma ANOVA *two way* com interaï¿½ï¿½o? Ou ï¿½ melhor avaliarmos o modelo sem a interaï¿½ï¿½o (como modelo aditivo)? Ou seria melhor desconsiderar essa anï¿½lise como uma ANOVA *two way* e usar somente como uma ANOVA *one way* para somente um dos fatores (`N` ou `P`)? Justifique a sua resposta.
 
 **R:** *Escreva a sua resposta aqui*
 
 
-## 6. Os resíduos do teste
-Avalie os resíduos do teste usando a função `plot()` do modelo `mod`. Os comandos já estão escritos a seguir. Só necessitando você colocar qual modelo deve ser avaliado:
-ANOVA *two way* com interação:
+## 6. Os resï¿½duos do teste
+Avalie os resï¿½duos do teste usando a funï¿½ï¿½o `plot()` do modelo `mod`. Os comandos jï¿½ estï¿½o escritos a seguir. Sï¿½ necessitando vocï¿½ colocar qual modelo deve ser avaliado:
+ANOVA *two way* com interaï¿½ï¿½o:
 
 $$yield \sim N + P + N:P $$
 
 
-ANOVA *two way* sem interação:
+ANOVA *two way* sem interaï¿½ï¿½o:
 
 $$yield \sim N + P$$
-ANOVA *one way* com Nitrogênio como fator
+ANOVA *one way* com Nitrogï¿½nio como fator
 
 $$yield \sim N $$
-Ou com Fósforo como fator
+Ou com Fï¿½sforo como fator
 
 $$yield \sim P $$
 
@@ -155,7 +155,7 @@ plot(mod, which=2)
 ```
 
 
-Analise os resíduos e faça as conclusões necessárias sobre eles. Existem outliers? Os resíduos seguem os pressupostos do teste?
+Analise os resï¿½duos e faï¿½a as conclusï¿½es necessï¿½rias sobre eles. Existem outliers? Os resï¿½duos seguem os pressupostos do teste?
 
 **R:** *Escreva a sua resposta aqui*
 
@@ -165,7 +165,7 @@ Conclua sobre a ANOVA. Deve ser executado um teste *post hoc*? Por que?
 
 **R:** *Escreva a sua resposta aqui*
 
-Se for o caso, execute o teste *post hoc*, usando a função `TukeyHSD()` no resultado da função `aov()` feita com o modelo linear `mod`, anteriormente construído, logo abaixo. Se não for o caso (realizar teste post hoc), não escreva comando algum. 
+Se for o caso, execute o teste *post hoc*, usando a funï¿½ï¿½o `TukeyHSD()` no resultado da funï¿½ï¿½o `aov()` feita com o modelo linear `mod`, anteriormente construï¿½do, logo abaixo. Se nï¿½o for o caso (realizar teste post hoc), nï¿½o escreva comando algum. 
 
 ```{r}
 # Colocar comandos aqui:
@@ -173,22 +173,22 @@ Se for o caso, execute o teste *post hoc*, usando a função `TukeyHSD()` no resul
 ```
 
 
-## 8. Conclusão
-Após todos os testes, conclua sobre a relação entre `yield` (variável resposta), `N` e `P` (variáveis explicativas). Existem diferenças nas médias? Existe algum grupo que se diferencia? Explique
+## 8. Conclusï¿½o
+Apï¿½s todos os testes, conclua sobre a relaï¿½ï¿½o entre `yield` (variï¿½vel resposta), `N` e `P` (variï¿½veis explicativas). Existem diferenï¿½as nas mï¿½dias? Existe algum grupo que se diferencia? Explique
 
-**R:** *Escreva a sua conclusão aqui*
-
-
+**R:** *Escreva a sua conclusï¿½o aqui*
 
 
 
 
 
-# Coeficientes de Correlação de Pearson e de Spearman
+
+
+# Coeficientes de Correlaï¿½ï¿½o de Pearson e de Spearman
 
 ## 1. Dados
 
-Será utilizado nesse exercício os dados das colunas `mpg` e `wt` do *data frame* `mtcars`, que fornece os valores de consumo (milhas por galão = `mpg`) e peso (*wight* = `wt`) de alguns carros fabricados nos Estados Unidos. Já fiz a separação desses dados em variáveis resposta (`y`, que é a variável de consumo dos carros) e explicativa (`x`, que é a variável peso dos carros). Ambas variáveis são numéricas e contínuas.
+Serï¿½ utilizado nesse exercï¿½cio os dados das colunas `mpg` e `wt` do *data frame* `mtcars`, que fornece os valores de consumo (milhas por galï¿½o = `mpg`) e peso (*wight* = `wt`) de alguns carros fabricados nos Estados Unidos. Jï¿½ fiz a separaï¿½ï¿½o desses dados em variï¿½veis resposta (`y`, que ï¿½ a variï¿½vel de consumo dos carros) e explicativa (`x`, que ï¿½ a variï¿½vel peso dos carros). Ambas variï¿½veis sï¿½o numï¿½ricas e contï¿½nuas.
 
 ```{r}
 data("mtcars")
@@ -198,22 +198,22 @@ x<-mtcars$wt
 
 ## 2. Verifique os pressupostos
 
-### A. A covariação é linear
+### A. A covariaï¿½ï¿½o ï¿½ linear
 
-Para isso, faça um gráfico com a função `plot()` entre as variáveis `x` e `y`. **Isso já está feito:**
+Para isso, faï¿½a um grï¿½fico com a funï¿½ï¿½o `plot()` entre as variï¿½veis `x` e `y`. **Isso jï¿½ estï¿½ feito:**
 
 ```{r}
 plot(y~x)
 ```
-A relação segue uma linearidade e/ou é monotônica? Explique.
+A relaï¿½ï¿½o segue uma linearidade e/ou ï¿½ monotï¿½nica? Explique.
 
 **R:** *Coloque a sua resposta aqui*
 
-### B. As variáveis x e y seguem a normalidade
-Verifique se as variáveis `x` e `y` seguem a distribuição normal, utilizando para isso a função `shapiro.test()`
+### B. As variï¿½veis x e y seguem a normalidade
+Verifique se as variï¿½veis `x` e `y` seguem a distribuiï¿½ï¿½o normal, utilizando para isso a funï¿½ï¿½o `shapiro.test()`
 
 ```{r}
-# Faça o teste aqui
+# Faï¿½a o teste aqui
 
 ```
 
@@ -221,8 +221,8 @@ O que podemos concluir com o teste de Shapiro-Wilk? Justifique.
 
 **R:** *Coloque a sua resposta aqui*
 
-## 3. Escolha o método adequado e teste se o coeficiente é significativo
-Para isso, veja o output da função `cor.test()`, observando o `p-value`, e selecione o coeficiente adequado, colocando no argumento `method ="spearman"` para o coefienciente de Spearman ou `method ="pearson"`.
+## 3. Escolha o mï¿½todo adequado e teste se o coeficiente ï¿½ significativo
+Para isso, veja o output da funï¿½ï¿½o `cor.test()`, observando o `p-value`, e selecione o coeficiente adequado, colocando no argumento `method ="spearman"` para o coefienciente de Spearman ou `method ="pearson"`.
 
 ```{r}
 cor.test(x=x,
@@ -230,13 +230,13 @@ cor.test(x=x,
          method= ---)
 ```
 
-Qual foi o método escolhido? Justifique.
+Qual foi o mï¿½todo escolhido? Justifique.
 
 **R:** *Coloque a sua resposta aqui*
 
 
-## 4. Faça a conclusão
+## 4. Faï¿½a a conclusï¿½o
 
-O que o coeficiente aponta? O que podemos concluir na relação entre peso (`wt`) e consumo (`mpg`)? Justifique. 
+O que o coeficiente aponta? O que podemos concluir na relaï¿½ï¿½o entre peso (`wt`) e consumo (`mpg`)? Justifique. 
 
 **R:** *Coloque a sua resposta aqui*
